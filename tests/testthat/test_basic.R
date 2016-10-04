@@ -4,9 +4,6 @@ library(testthat)
 # TODO: write basic test of HAL functionality.
 context("Basic test")
 
-# Source other SL functions
-source("tests/Simulation/otherSLFunctions.R")
-
 # define the SuperLearner library
 SL.library <- c("SL.hal", "SL.glm", "SL.glmnet")
 

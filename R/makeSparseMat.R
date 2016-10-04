@@ -81,8 +81,7 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
       # matrix of all d choose k combinations
       combos <- combn(d, k)
 
-      if (verbose)
-        cat("Making ", ncol(combos), " basis fns of dimension ", k, "\n")
+      if (verbose) cat("Making ", ncol(combos), " basis fns of dimension ", k, "\n")
       # adjust column indicators for column indices
       colStart <- colEnd + 1
       colEnd <- (colStart - 1) + ncol(combos)

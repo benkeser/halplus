@@ -2,6 +2,7 @@
 
 S3method(predict,SL.hal)
 export(SL.hal)
+export(hal)
 importFrom(Matrix,sparseMatrix)
 importFrom(bit,bit)
 importFrom(data.table,data.table)
