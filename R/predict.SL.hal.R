@@ -1,13 +1,16 @@
+#' @importFrom plyr alply
+#' @importFrom stats predict
 #' @export
 predict.SL.hal <- function(object, newdata, bigDesign=FALSE, verbose=TRUE,
-                            chunks=1000,
-                            s = ifelse(object$useMin, object$object$lambda.min, object$object$lambda.1se),...)
+           chunks=1000,
+           s = ifelse(object$useMin, object$object$lambda.min, object$object$lambda.1se),
+           ...)
 {
   if(!object$sparseMat){
     d <- ncol(object$X)
     # if you want to get predictions all at once (smaller newdata)
     if(bigDesign){
-      uniList <- alply(matrix(1:ncol(object$X)),1,function(x){
+      uniList <- plyr::alply(matrix(1:ncol(object$X)),1,function(x){
         myX <- matrix(newdata[,x],ncol=length(object$X[,x]), nrow=length(newdata[,x])) -
           matrix(object$X[,x], ncol=length(object$X[,x]), nrow=length(newdata[,x]), byrow=TRUE)
         myX <- ifelse(myX < 0, 0, 1)
@@ -15,8 +18,8 @@ predict.SL.hal <- function(object, newdata, bigDesign=FALSE, verbose=TRUE,
       })
 
       if(d >=2){
-        highDList <- alply(matrix(2:d),1,function(k){
-          thisList <- alply(combn(d,k),2,function(x){
+        highDList <- plyr::alply(matrix(2:d),1,function(k){
+          thisList <- plyr::alply(combn(d,k),2,function(x){
             Reduce("*",uniList[x])
           })
           Reduce("cbind",thisList)
@@ -37,7 +40,7 @@ predict.SL.hal <- function(object, newdata, bigDesign=FALSE, verbose=TRUE,
       # get row by row predictions, so you never have to store a big design matrix
       # for newdata
       pred <- apply(as.matrix(newdata),1,function(i){
-        uniList <- alply(matrix(1:ncol(object$X)),1,function(x){
+        uniList <- plyr::alply(matrix(1:ncol(object$X)),1,function(x){
           myX <- matrix(i[x],ncol=length(object$X[,x]), nrow=length(i[x])) -
             matrix(object$X[,x], ncol=length(object$X[,x]), nrow=length(i[x]), byrow=TRUE)
           myX <- ifelse(myX < 0, 0, 1)
@@ -45,8 +48,8 @@ predict.SL.hal <- function(object, newdata, bigDesign=FALSE, verbose=TRUE,
         })
 
         if(d >=2){
-          highDList <- alply(matrix(2:d),1,function(k){
-            thisList <- alply(combn(d,k),2,function(x){
+          highDList <- plyr::alply(matrix(2:d),1,function(k){
+            thisList <- plyr::alply(combn(d,k),2,function(x){
               Reduce("*",uniList[x])
             })
             Reduce("cbind",thisList)

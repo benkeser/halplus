@@ -1,3 +1,4 @@
+#' @importFrom Matrix sparseMatrix
 doPred <- function(object,newdata,verbose=TRUE,s) {
   if(is.vector(newdata)) newdata <- matrix(newdata)
 
@@ -58,7 +59,7 @@ doPred <- function(object,newdata,verbose=TRUE,s) {
       fullp <- myp
     }
     #
-    tmp <- sparseMatrix(i=fulli, p=fullp, x=1,
+    tmp <- Matrix::sparseMatrix(i=fulli, p=fullp, x=1,
                         dims=c(length(newdata[,1]),
                                length(notdupVec) + length(object$colDup)))
   }

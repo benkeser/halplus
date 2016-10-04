@@ -1,3 +1,4 @@
+#' @importFrom plyr llply
 makeSparseMat <- function(X,newX=X, verbose=TRUE){
   if(is.vector(X)) X <- matrix(X, ncol=1)
   if(is.vector(newX)) newX <- matrix(newX, ncol=1)
@@ -86,7 +87,7 @@ makeSparseMat <- function(X,newX=X, verbose=TRUE){
 
       # list of length d choose k, each entry containing
       # n indices of rows corresponding to subjects
-      i.list <- llply(j.list, function(x){
+      i.list <- plyr::llply(j.list, function(x){
         rep(as.numeric(names(x)), unlist(lapply(x, length), use.names=FALSE))
       })
 
@@ -111,6 +112,6 @@ makeSparseMat <- function(X,newX=X, verbose=TRUE){
   }
 
   # make the sparseMatrix
-  grbg <- sparseMatrix(i=i[order(i)],j=j[order(i)],x=1, dims=c(n, nX*(2^d - 1)))
+  grbg <- Matrix::sparseMatrix(i=i[order(i)],j=j[order(i)],x=1, dims=c(n, nX*(2^d - 1)))
   return(grbg)
 }

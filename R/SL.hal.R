@@ -4,6 +4,12 @@
 #' @param Y outcome
 #' @param X data
 #' @importFrom glmnet cv.glmnet
+#' @importFrom bit bit
+#' @importFrom stats gaussian predict
+#' @importFrom utils combn
+#' @importFrom data.table data.table set setkey
+#' @importFrom plyr alply
+#' @importFrom stringr str_c str_replace_na
 #' @export
 SL.hal <- function(Y, X, newX, family=gaussian(),
                    verbose=TRUE,
@@ -117,11 +123,11 @@ SL.hal <- function(Y, X, newX, family=gaussian(),
       intval <- unclass(bitvals) # integer representation of the bit vector
       # stringval <- str_c(intval, collapse = "")
       if (any(is.na(intval))) ID_withNA <- c(ID_withNA, i)
-      set(datDT, i, 2L, value = str_c(str_replace_na(intval), collapse = ""))
+      data.table::set(datDT, i, 2L, value = str_c(str_replace_na(intval), collapse = ""))
     }
     # create a hash-key on the string representation of the column,
     # sorts it by bit_to_int_to_str using radix sort:
-    setkey(datDT, bit_to_int_to_str)
+    data.table::setkey(datDT, bit_to_int_to_str)
     # add logical column indicating duplicates,
     # following the first non-duplicate element
     datDT[, duplicates := duplicated(datDT)]
