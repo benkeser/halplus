@@ -8,14 +8,8 @@ library(caret)
 library(np)
 library(RCurl)
 
-# source HAL functions
-eval(parse(text=getURL(paste0("https://raw.githubusercontent.com/benkeser/",
-                              "hal/master/halFunctions.R"))))
-# source other SL functions
-eval(parse(text=getURL(paste0("https://raw.githubusercontent.com/benkeser/",
-                              "hal/master/Simulation/otherSLFunctions.R")))
-     )
-
+# Source other SL functions
+source("../Simulation/otherSLFunctions.R")
 
 # define the SuperLearner library
 SL.library <- c("SL.hal",
@@ -34,18 +28,19 @@ SL.library <- c("SL.hal",
 #====================================================
 outList <- vector(mode="list",length=5)
 ct <- 0
-for(datName in c("cpu","laheart","oecdpanel","pima","fev")){
+for (datName in c("cpu","laheart","oecdpanel","pima","fev")){
   ct <- ct + 1
-  # read data from github
-  datUrl <- getURL(paste0("https://raw.githubusercontent.com/benkeser/",
-                          "hal/master/Data%20Analysis/",datName,".csv"))
-  dat <- read.csv(textConnection(datUrl),header=TRUE)
+
+  # Read csvs from the extdata folder.
+  file <- system.file("extdata", paste0(dataset_name, ".csv"), package="hal")
+  data = read.csv(file)
+
 
   # fit cross-validated super learner
   # each data set is arranged so that the outcome is in the first column
   # and the rest of the variables are in the remaining columns
   set.seed(1568)
-  outList[[ct]] <- CV.SuperLearner(
+  outList[[ct]] <- SuperLearner::CV.SuperLearner(
     Y=dat[,1],
     X=dat[,2:ncol(dat)],
     V=10,

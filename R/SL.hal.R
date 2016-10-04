@@ -270,6 +270,6 @@ SL.hal <- function(Y,
   }
 
   out <- list(pred = pred, fit = fit)
-  cat("Done with SL.hal")
+  cat("Done with SL.hal\n")
   return(out)
 }
