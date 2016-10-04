@@ -1,0 +1,26 @@
+Package: hal
+Title: Highly Adaptive Lasso
+Version: 0.1
+Authors@R: person("David", "Benkeser", email = "david.benkeser@berkeley.edu",
+                  role = c("aut", "cre"))
+Description: Highly adaptive lasso.
+Depends:
+    R (>= 3.1.0)
+License: GPL (>= 2)
+LazyData: true
+Imports:
+    bartMachine,
+    bit,
+    caret,
+    data.table,
+    gbm,
+    glmnet,
+    Matrix,
+    nnet,
+    np,
+    plyr,
+    RColorBrewer,
+    RCurl,
+    stringr,
+    SuperLearner
+RoxygenNote: 5.0.1
