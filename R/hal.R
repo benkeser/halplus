@@ -217,14 +217,28 @@ hal <- function(Y,
     datDT[, .(ID, duplicates)]
 
     dupInds <- datDT[, ID][which(datDT[, duplicates])]
+
+    # ----------------------------------------------------------------------
+    # OS: NEW FASTER APPROACH TO FIND DUPLICATE IDs
+    # ----------------------------------------------------------------------
+    # get the number of duplicates in each group if its 1 the column is unique and we are note interested:
+    datDT[, Ngrp := .N, by = bit_to_int_to_str]
+    # collapse each duplicate group into a list of IDs, do that only among strings that have duplicates
+    collapsedDT <- datDT[Ngrp > 1, list(list(ID)), by = bit_to_int_to_str]
+    colDups <- collapsedDT[["V1"]]
+    # colDups[[2]]
+
+    # ----------------------------------------------------------------------
+    # OS: OLD APPROACH TO BE REMOVED AFTER VALIDATED
+    # ----------------------------------------------------------------------
     uniqDup <- unique(datDT[duplicates == TRUE, bit_to_int_to_str])
-
-    # Debug here.
-    #browser()
-
-    colDups <- alply(uniqDup, 1, function(l) {
+    colDups.old <- alply(uniqDup, 1, function(l) {
       datDT[, ID][which(datDT[, bit_to_int_to_str] == l)]
     })
+    # ----------------------------------------------------------------------
+    # colDups <- alply(uniqDup, 1, function(l) {
+    #   datDT[, ID][which(datDT[, bit_to_int_to_str] == l)]
+    # })
 
     time_dup_end = proc.time()
 
