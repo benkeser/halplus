@@ -39,6 +39,7 @@ hal <- function(Y,
 
   # Initialize prediction object to null in case newX = NULL.
   pred = NULL
+  times = NULL
 
   if (!sparseMat) {
     uniList <- plyr::alply(as.matrix(X), 2, function(x) {
@@ -106,7 +107,7 @@ hal <- function(Y,
         makeNewDesignX <- !all(X == newX)
 
       if (makeNewDesignX) {
-        uniList <- alply(matrix(1:ncol(X)), 1, function(x) {
+        uniList <- plyr::alply(matrix(1:ncol(X)), 1, function(x) {
           myX <- matrix(newX[, x], ncol = length(X[, x]), nrow = length(newX[, x])) -
             matrix(
               X[, x],
@@ -119,8 +120,8 @@ hal <- function(Y,
         })
 
         if (d >= 2) {
-          highDList <- alply(matrix(2:d), 1, function(k) {
-            thisList <- alply(combn(d, k), 2, function(x) {
+          highDList <- plyr::alply(matrix(2:d), 1, function(k) {
+            thisList <- plyr::alply(combn(d, k), 2, function(x) {
               Reduce("*", uniList[x])
             })
             Reduce("cbind", thisList)
@@ -160,7 +161,11 @@ hal <- function(Y,
 
     if (verbose) cat("Making sparse matrix \n")
 
+    time_sparse_start = proc.time()
     X.init <- makeSparseMat(X = X, newX = X, verbose = verbose)
+
+    time_sparse_end = proc.time()
+    time_sparse_matrix = time_sparse_end - time_sparse_start
 
     ## find duplicated columns
     if (verbose) cat("Finding duplicate columns \n")
@@ -214,9 +219,16 @@ hal <- function(Y,
     dupInds <- datDT[, ID][which(datDT[, duplicates])]
     uniqDup <- unique(datDT[duplicates == TRUE, bit_to_int_to_str])
 
+    # Debug here.
+    #browser()
+
     colDups <- alply(uniqDup, 1, function(l) {
       datDT[, ID][which(datDT[, bit_to_int_to_str] == l)]
     })
+
+    time_dup_end = proc.time()
+
+    time_find_duplicates = time_dup_end - time_sparse_end
 
     if (verbose) cat("Fitting lasso \n")
     if (length(dupInds) > 0) {
@@ -255,6 +267,10 @@ hal <- function(Y,
       )
     }
 
+    time_lasso_end = proc.time()
+
+    time_lasso = time_lasso_end - time_dup_end
+
     fit <- list(object = fitCV,
                 useMin = useMin,
                 X = X,
@@ -288,12 +304,28 @@ hal <- function(Y,
                       chunks = 10000)
     }
 
+    time_pred_end = proc.time()
+
+    time_pred = time_pred_end - time_lasso_end
+
+    time_everything = time_sparse_matrix + time_find_duplicates +
+      time_lasso + time_pred
+
+    times = list(sparse_matrix = time_sparse_matrix,
+              find_duplicates = time_find_duplicates,
+              lasso = time_lasso,
+              pred = time_pred,
+              everything = time_everything)
+
+    # Convert from a list to a nice matrix.
+    times = t(simplify2array(result$times))
+
     # Done with sparse Matix implementation.
   }
 
   class(fit) <- "SL.hal"
 
-  out <- list(pred = pred, fit = fit)
+  out <- list(pred = pred, fit = fit, times = times)
   if (verbose) cat("Done with SL.hal\n")
   return(out)
 }

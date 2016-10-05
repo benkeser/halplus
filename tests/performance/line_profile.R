@@ -24,25 +24,43 @@ library(lineprof)
 # Line profiling code from:
 # http://adv-r.had.co.nz/Profiling.html#measure-perf
 
-prof_result = lineprof::lineprof({
+system.time({
+  prof_result = lineprof::lineprof({
   result <- hal::hal(Y = data[, 1],
     # Restrict to just the first 7 covariates for testing purposes.
     X = data[, 2:min(1 + 7, ncol(data))],
     #X = data[, 2:ncol(data)],
     family = gaussian(), verbose = T)
+  })
 })
 
 # Review profiling result.
 prof_result
+str(prof_result)
 
-# Review in a cool interactive explorer.
-shine(prof_result)
+# Show rows with the top 100 times.
+if (F) {
+  # CK: this stuff is not working - may not be possible due to structure of data.
+  top = order(prof_result$time, decreasing = T)[1:100]
+  names(prof_result)
+  str(prof_result)
+  prof = prof_result[top, ]
+  prof
+  prof_result$time[top]
+  prof_result$ref[[top]]
+  str(prof_result$ref)
+}
+
+if (F) {
+  # Review in a cool interactive explorer.
+  shine(prof_result)
+}
 
 ##########################################
 # Run HAL once on a single dataset (no cross-validation).
 # non-sparse Mat version.
 
-prof_result = lineprof::lineprof({
+prof_result2 = lineprof::lineprof({
   result <- hal::hal(Y = data[, 1],
     # Restrict to just the first 7 covariates for testing purposes.
     X = data[, 2:min(1 + 7, ncol(data))],
@@ -51,10 +69,12 @@ prof_result = lineprof::lineprof({
 })
 
 # Review profiling result.
-prof_result
+prof_result2
 
-# Review in a cool interactive explorer.
-shine(prof_result)
+if (F) {
+  # Review in a cool interactive explorer.
+  shine(prof_result2)
+}
 
 
 ##########################################
