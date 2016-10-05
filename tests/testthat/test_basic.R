@@ -41,6 +41,10 @@ for (dataset_name in datasets) {
   #   family = gaussian(),
   #   SL.library = SL.library
   # )
+  
+  # just call hal
+  # note that this implementation doesn't time the prediction
+  # because there's no newX specified. 
   outList[[count]] <- hal(
       Y = data[, 1],
       # Restrict to d covariates for testing purposes.
