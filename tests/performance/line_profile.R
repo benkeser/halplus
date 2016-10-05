@@ -28,11 +28,14 @@ system.time({
   prof_result = lineprof::lineprof({
   result <- hal::hal(Y = data[, 1],
     # Restrict to just the first 7 covariates for testing purposes.
-    X = data[, 2:min(1 + 7, ncol(data))],
-    #X = data[, 2:ncol(data)],
+    #X = data[, 2:min(1 + 7, ncol(data))],
+    X = data[, 2:ncol(data)],
     family = gaussian(), verbose = T)
   })
 })
+
+# Review timing by section.
+result$times
 
 # Review profiling result.
 prof_result

@@ -329,7 +329,7 @@ hal <- function(Y,
               everything = time_everything)
 
     # Convert from a list to a nice matrix.
-    times = t(simplify2array(result$times))
+    times = t(simplify2array(times))
 
     # Done with sparse Matix implementation.
   }
