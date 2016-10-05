@@ -228,17 +228,14 @@ hal <- function(Y,
     colDups <- collapsedDT[["V1"]]
     # colDups[[2]]
 
-    # ----------------------------------------------------------------------
-    # OS: OLD APPROACH TO BE REMOVED AFTER VALIDATED
-    # ----------------------------------------------------------------------
-    uniqDup <- unique(datDT[duplicates == TRUE, bit_to_int_to_str])
-    colDups.old <- alply(uniqDup, 1, function(l) {
-      datDT[, ID][which(datDT[, bit_to_int_to_str] == l)]
-    })
-    # ----------------------------------------------------------------------
-    # colDups <- alply(uniqDup, 1, function(l) {
+    ## ----------------------------------------------------------------------
+    ## OS: OLD APPROACH TO BE REMOVED AFTER VALIDATED
+    ## ----------------------------------------------------------------------
+    # uniqDup <- unique(datDT[duplicates == TRUE, bit_to_int_to_str])
+    # colDups.old <- alply(uniqDup, 1, function(l) {
     #   datDT[, ID][which(datDT[, bit_to_int_to_str] == l)]
     # })
+    ## ----------------------------------------------------------------------
 
     time_dup_end = proc.time()
 
