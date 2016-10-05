@@ -290,7 +290,8 @@ hal <- function(Y,
                 colDups = colDups,
                 sparseMat = sparseMat
     )
-
+    class(fit) <- "SL.hal"
+    
     if (identical(X, newX)) {
       if (length(dupInds) > 0) {
         pred <-
@@ -334,8 +335,6 @@ hal <- function(Y,
 
     # Done with sparse Matix implementation.
   }
-
-  class(fit) <- "SL.hal"
 
   out <- list(pred = pred, fit = fit, times = times)
   if (verbose) cat("Done with SL.hal\n")
