@@ -32,7 +32,8 @@ hal <- function(Y,
                 sparseMat = TRUE,
                 nfolds = ifelse(length(Y) <= 100, 20, 10),
                 nlambda = 100,
-                useMin = TRUE
+                useMin = TRUE,
+                ... # allow extra arguments with no death
                 ) {
 
   d <- ncol(X)
