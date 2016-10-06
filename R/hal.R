@@ -8,7 +8,9 @@
 #' @param family Statistical family
 #' @param verbose Set to T for more detailed output
 #' @param obsWeights observation weights
-#' @param sparseMat Use sparse matrix implementation or normal matrix implementation.
+#' @param sparseMat Use sparse matrix implementation or normal matrix
+#'   implementation. Normal matrix implementation is old and not guaranteed to
+#'   work correctly.
 #' @param nfolds Number of CV folds for cv.glmnet
 #' @param nlambda Number of lambda values to test in cv.glmnet.
 #' @param useMin Glmnet option - use minimum risk lambda or 1se lambda (more
