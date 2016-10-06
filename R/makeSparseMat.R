@@ -1,4 +1,5 @@
 #' @importFrom plyr llply
+# TODO: don't always have a newX.
 makeSparseMat <- function(X, newX = X, verbose = TRUE) {
 
   if (is.vector(X)) X <- matrix(X, ncol = 1)
