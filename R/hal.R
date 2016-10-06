@@ -13,6 +13,8 @@
 #' @param nlambda Number of lambda values to test in cv.glmnet.
 #' @param useMin Glmnet option - use minimum risk lambda or 1se lambda (more
 #'   penalization).
+#' @param debug Setting to T will run garbage collection to improve the accuracy
+#'  of memory monitoring.
 #'
 #' @importFrom glmnet cv.glmnet
 #' @importFrom bit bit
@@ -33,10 +35,14 @@ hal <- function(Y,
                 nfolds = ifelse(length(Y) <= 100, 20, 10),
                 nlambda = 100,
                 useMin = TRUE,
+                debug = T,
                 ... # allow extra arguments with no death
                 ) {
 
   d <- ncol(X)
+
+  # Run garbage collection if we are in debug mode.
+  if (debug) gc()
 
   # Initialize prediction object to null in case newX = NULL.
   pred = NULL
@@ -169,6 +175,9 @@ hal <- function(Y,
     time_sparse_end = proc.time()
     time_sparse_matrix = time_sparse_end - time_sparse_start
 
+    # Run garbage collection if we are in debug mode.
+    if (debug) gc()
+
     ## find duplicated columns
     if (verbose) cat("Finding duplicate columns \n")
 
@@ -243,6 +252,9 @@ hal <- function(Y,
 
     time_find_duplicates = time_dup_end - time_sparse_end
 
+    # Run garbage collection if we are in debug mode.
+    if (debug) gc()
+
     if (verbose) cat("Fitting lasso \n")
     if (length(dupInds) > 0) {
       notDupInds <- (1:ncol(X.init))[-unlist(colDups, use.names = FALSE)]
@@ -292,7 +304,7 @@ hal <- function(Y,
                 sparseMat = sparseMat
     )
     class(fit) <- "SL.hal"
-    
+
     if (identical(X, newX)) {
       if (length(dupInds) > 0) {
         pred <-
@@ -335,6 +347,9 @@ hal <- function(Y,
 
     # Done with sparse Matix implementation.
   }
+
+  # Run garbage collection if we are in debug mode.
+  if (debug) gc()
 
   out <- list(pred = pred, fit = fit, times = times)
   if (verbose) cat("Done with SL.hal\n")

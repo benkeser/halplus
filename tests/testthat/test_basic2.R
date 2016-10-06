@@ -1,7 +1,6 @@
 library(hal)
 library(testthat)
 
-# TODO: write basic test of HAL functionality.
 context("Basic test")
 
 # Number of covariates to use
