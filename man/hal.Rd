@@ -6,7 +6,8 @@
 \usage{
 hal(Y, X, newX = NULL, family = gaussian(), verbose = F,
   obsWeights = rep(1, length(Y)), sparseMat = TRUE,
-  nfolds = ifelse(length(Y) <= 100, 20, 10), nlambda = 100, useMin = TRUE)
+  nfolds = ifelse(length(Y) <= 100, 20, 10), nlambda = 100, useMin = TRUE,
+  ...)
 }
 \arguments{
 \item{Y}{outcome}
