@@ -22,3 +22,6 @@ hal.fit <- hal(
     family = gaussian(),
     verbose = TRUE
 )
+
+# Review timing
+hal.fit$times
