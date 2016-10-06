@@ -3,10 +3,8 @@ library(testthat)
 
 context("makeSparseMat")
 
-# TODO: need to run some specific tests on this method.
-
 # Number of covariates to use.
-d <- 5
+d <- 8
 
 # Sample size
 n <- 500
@@ -15,8 +13,21 @@ n <- 500
 set.seed(1)
 x = data.frame(matrix(rnorm(n * d), ncol = d))
 
-sparse_mat = hal::makeSparseMat(x)
+library(lineprof)
+system.time({
+  prof_result = lineprof::lineprof({
+    sparse_mat = hal::makeSparseMat(x)
+  })
+})
 str(sparse_mat)
+
+# Review profiling results (need a wide console window).
+prof_result
+
+# Review in shiny (run manually).
+if (F) {
+  shine(prof_result)
+}
 
 # Convert to a normal matrix.
 normal_mat = as.matrix(sparse_mat)
