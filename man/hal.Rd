@@ -7,7 +7,7 @@
 hal(Y, X, newX = NULL, family = gaussian(), verbose = F,
   obsWeights = rep(1, length(Y)), sparseMat = TRUE,
   nfolds = ifelse(length(Y) <= 100, 20, 10), nlambda = 100, useMin = TRUE,
-  ...)
+  debug = T, ...)
 }
 \arguments{
 \item{Y}{outcome}
@@ -30,6 +30,9 @@ hal(Y, X, newX = NULL, family = gaussian(), verbose = F,
 
 \item{useMin}{Glmnet option - use minimum risk lambda or 1se lambda (more
 penalization).}
+
+\item{debug}{Setting to T will run garbage collection to improve the accuracy
+of memory monitoring.}
 }
 \description{
 Model fitting function.
