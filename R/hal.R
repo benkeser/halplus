@@ -163,6 +163,7 @@ hal <- function(Y,
     if (verbose) cat("Making sparse matrix \n")
 
     time_sparse_start = proc.time()
+
     X.init <- makeSparseMat(X = X, newX = X, verbose = verbose)
 
     time_sparse_end = proc.time()
@@ -320,8 +321,7 @@ hal <- function(Y,
 
     time_pred = time_pred_end - time_lasso_end
 
-    time_everything = time_sparse_matrix + time_find_duplicates +
-      time_lasso + time_pred
+    time_everything = time_pred_end - time_sparse_start
 
     times = list(sparse_matrix = time_sparse_matrix,
               find_duplicates = time_find_duplicates,
