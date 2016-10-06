@@ -4,29 +4,22 @@ library(testthat)
 # TODO: write basic test of HAL functionality.
 context("Basic test")
 
-# number of covariates to use
+# Number of covariates to use
 d <- 10
 
-# sample size
+# Sample size
 n <- 2000
 
-# simulate some data
-# all continuous covariates
-eval(parse(text=paste0(
-    "x <- data.frame(", 
-    paste0("x",1:d,"=rnorm(n)",collapse=","),
-    ")"
-)))
+# Simulate some data, all continuous covariates.
+set.seed(1)
+x = data.frame(matrix(rnorm(n * d), ncol = d))
+y = rnorm(n, rowSums(x))
 
-y <- eval(parse(text=paste0(
-    "rnorm(n,",paste0("x",1:d,collapse="+"),")" 
-)))
-
-# fit hal
+# Fit hal
 hal.fit <- hal(
     Y = y,
     # Restrict to d covariates for testing purposes.
     X = x,
-    family= gaussian(),
+    family = gaussian(),
     verbose = TRUE
 )
