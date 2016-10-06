@@ -15,6 +15,7 @@
 #'   penalization).
 #' @param debug Setting to T will run garbage collection to improve the accuracy
 #'  of memory monitoring.
+#' @param parallel Use a regisered parallel backend if possible.
 #'
 #' @importFrom glmnet cv.glmnet
 #' @importFrom bit bit
@@ -36,6 +37,7 @@ hal <- function(Y,
                 nlambda = 100,
                 useMin = TRUE,
                 debug = T,
+                parallel = F,
                 ... # allow extra arguments with no death
                 ) {
 
@@ -274,7 +276,8 @@ hal <- function(Y,
           nfolds = nfolds,
           family = family$family,
           alpha = 1,
-          nlambda = nlambda
+          nlambda = nlambda,
+          parallel = parallel
         )
     } else {
       # No duplication.
@@ -288,7 +291,8 @@ hal <- function(Y,
         nfolds = nfolds,
         family = family$family,
         alpha = 1,
-        nlambda = nlambda
+        nlambda = nlambda,
+        parallel = parallel
       )
     }
 

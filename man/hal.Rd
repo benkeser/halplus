@@ -7,7 +7,7 @@
 hal(Y, X, newX = NULL, family = gaussian(), verbose = F,
   obsWeights = rep(1, length(Y)), sparseMat = TRUE,
   nfolds = ifelse(length(Y) <= 100, 20, 10), nlambda = 100, useMin = TRUE,
-  debug = T, ...)
+  debug = T, parallel = F, ...)
 }
 \arguments{
 \item{Y}{outcome}
@@ -33,6 +33,8 @@ penalization).}
 
 \item{debug}{Setting to T will run garbage collection to improve the accuracy
 of memory monitoring.}
+
+\item{parallel}{Use a regisered parallel backend if possible.}
 }
 \description{
 Model fitting function.
