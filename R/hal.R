@@ -351,7 +351,7 @@ hal <- function(Y,
     # Convert from a list to a nice matrix.
     times = t(simplify2array(times))
 
-    # Done with sparse Matix implementation.
+    # Done with sparse Matrix implementation.
   }
 
   # Run garbage collection if we are in debug mode.

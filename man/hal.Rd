@@ -22,7 +22,9 @@ hal(Y, X, newX = NULL, family = gaussian(), verbose = F,
 
 \item{obsWeights}{observation weights}
 
-\item{sparseMat}{Use sparse matrix implementation or normal matrix implementation.}
+\item{sparseMat}{Use sparse matrix implementation or normal matrix
+implementation. Normal matrix implementation is old and not guaranteed to
+work correctly.}
 
 \item{nfolds}{Number of CV folds for cv.glmnet}
 
@@ -39,4 +41,3 @@ of memory monitoring.}
 \description{
 Model fitting function.
 }
-
