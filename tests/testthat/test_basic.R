@@ -1,56 +1,27 @@
 library(hal)
 library(testthat)
 
-# TODO: write basic test of HAL functionality.
 context("Basic test")
 
-# define the SuperLearner library
-SL.library <- c("SL.hal", "SL.glm", "SL.glmnet")
+# Number of covariates to use
+d <- 3
 
-# number of covariates to use
-d <- 10
+# Sample size
+n <- 60
 
-#====================================================
-# Compute SuperLearner for each of the data sets
-#====================================================
-#datasets = c("cpu","laheart","oecdpanel","pima","fev")
-datasets = c("laheart")
-outList <- vector(mode = "list", length = length(datasets))
-count <- 0
-for (dataset_name in datasets) {
-  count <- count + 1
+# Simulate some data, all continuous covariates.
+set.seed(1)
+x = data.frame(matrix(rnorm(n * d), ncol = d))
+y = rnorm(n, rowSums(x))
 
-  # Read csvs from the extdata folder.
-  file <- system.file("extdata", paste0(dataset_name, ".csv"), package = "hal")
-  data = read.csv(file)
+# Fit hal
+hal.fit <- hal(
+    Y = y,
+    # Restrict to d covariates for testing purposes.
+    X = x,
+    family = gaussian(),
+    verbose = TRUE
+)
 
-  # Remove the last row, which is all NA for some reason :/
-  # TODO: figure out why this is.
-  data = data[-nrow(data), ]
-
-  # fit cross-validated super learner
-  # each data set is arranged so that the outcome is in the first column
-  # and the rest of the variables are in the remaining columns
-  # set.seed(1568)
-  # outList[[count]] <- SuperLearner::SuperLearner(
-  #   Y = data[, 1],
-  #   # Restrict to just the first 3 covariates for testing purposes.
-  #   X = data[, 2:min(d+1, ncol(data))],
-  #   #X = data[, 2:ncol(data)],
-  #   #V=10,
-  #   family = gaussian(),
-  #   SL.library = SL.library
-  # )
-  
-  # just call hal
-  # note that this implementation doesn't time the prediction
-  # because there's no newX specified. 
-  outList[[count]] <- hal(
-      Y = data[, 1],
-      # Restrict to d covariates for testing purposes.
-      X = data[, 2:min(d+1, ncol(data))],
-      family= gaussian(),
-      verbose = TRUE
-  )
-  
-}
+# Review timing
+hal.fit$times
