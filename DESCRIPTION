@@ -9,20 +9,20 @@ Depends:
 License: GPL (>= 2)
 LazyData: true
 Imports:
-    bartMachine,
     bit,
-    caret,
     data.table,
-    gbm,
     glmnet,
     Matrix,
-    nnet,
     np,
     plyr,
+    stringr
+Suggests:
+    bartMachine,
+    caret,
+    gbm,
+    nnet,
     RColorBrewer,
     RCurl,
-    stringr,
-    SuperLearner
-Suggests:
-  testthat
-RoxygenNote: 5.0.1
+    SuperLearner,
+    testthat
+RoxygenNote: 6.0.1
