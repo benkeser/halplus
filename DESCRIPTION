@@ -19,8 +19,12 @@ Imports:
 Suggests:
     bartMachine,
     caret,
+    doMC,
+    doParallel,
+    foreach,
     gbm,
     nnet,
+    pryr,
     RColorBrewer,
     RCurl,
     SuperLearner,
