@@ -1,16 +1,19 @@
-screen.hal <- function(Y, X, family, alpha = 1, minscreen = 2, nfolds = 10, nlambda = 100,  ...) {
+
+screen.hal <- function(Y, X, alpha = .05, min = 5, ...){
   .SL.require('hal')
-  if(!is.matrix(X)) {
-        X <- model.matrix(~ -1 + ., X)
+  pvalues <- rep(NA, ncol(X))
+  for (i in 1:ncol(X)){
+    m <- lm(Y~ A+ X[,i])
+    p <- try(summary(m)$coef[3,4], silent = TRUE)
+    if (class(p) == "try-error") {
+      pvalues[i] <- 1
+    } else {
+      pvalues[i] <- p
     }
-    fitCV <- glmnet::cv.glmnet(x = X, y = Y, lambda = NULL, type.measure = 'deviance', nfolds = nfolds, family = family$family, alpha = alpha, nlambda = nlambda)
-      whichVariable <- (as.numeric(coef(fitCV$glmnet.fit, s = fitCV$lambda.min))[-1] != 0)
-      # the [-1] removes the intercept
-      if (sum(whichVariable) < minscreen) {
-              warning("fewer than minscreen variables passed the glmnet screen, increased lambda to allow minscreen variables")
-            sumCoef <- apply(as.matrix(fitCV$glmnet.fit$beta), 2, function(x) sum((x != 0)))
-                  newCut <- which.max(sumCoef >= minscreen)
-                  whichVariable <- (as.matrix(fitCV$glmnet.fit$beta)[, newCut] != 0)
-                    }
-        return(whichVariable)
+  }
+  keep <- pvalues <= alpha
+  if(sum(keep) < min){
+    keep[order(pvalues)[1:min]] <- TRUE
+  }
+  return(keep)
 }
