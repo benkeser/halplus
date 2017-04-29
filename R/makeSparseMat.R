@@ -1,3 +1,10 @@
+#' Creates a sparseMatrix of the indicators
+#'
+#' Add more details.
+#'
+#' @param X X
+#' @param newX newX
+#' @param verbose If true output extra info during execution.
 #' @importFrom plyr llply
 #' @export
 # TODO: don't always have a newX? What is the difference between X and newX?
@@ -54,6 +61,8 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
     Reduce(intersect, list(...))
   }
 
+  # This is the major user of execution time and memory.
+  # What does this do??
   .getIntersect <- function(...) {
     tmp <- lapply(..., function(b) {
       split(b[, 2], b[, 1])
@@ -68,7 +77,8 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
       b[paste(overlap)]
     })
 
-    # get intersection
+    # Get intersection
+    # CK: parse() and eval() are probably slowing this down.
     out <- eval(parse(text = paste0(
       paste0("mapply(.myIntersect,"),
       paste0("newtmp[[", 1:length(tmp), "]]", collapse = ","),
@@ -77,7 +87,7 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
     out
   }
 
-  # loop over higher order terms
+  # Loop over higher order terms.
   if (d > 1) {
     for (k in 2:d) {
 
@@ -92,6 +102,7 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
 
       # list of length d choose k, each entry
       # containing n indices of columns corresponding to subjects
+      # This is the primary cause of execution time and memory usage.
       j.list <- plyr::alply(combos, 2L, function(a) {
         .getIntersect(uni[a])
       })
@@ -117,7 +128,9 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
         rep.int((colStart:colEnd) - 1, times = unlist(nper, use.names =
                                                         FALSE)) * nX
 
-      # put it together
+      # Put it together
+      # CK: this is dynamic memory allocation - pre-allocating would be much better if possible.
+      # Can we determine what the size will be in advance, or no?
       i <- c(i, thisi)
       j <- c(j, thisj)
     }
