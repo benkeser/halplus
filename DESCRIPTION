@@ -3,7 +3,7 @@ Title: Highly Adaptive Lasso
 Version: 0.1
 Authors@R: person("David", "Benkeser", email = "david.benkeser@berkeley.edu",
                   role = c("aut", "cre"))
-Description: Highly adaptive lasso.
+Description: Highly adaptive LASSO.
 Depends:
     R (>= 3.1.0)
 License: GPL (>= 2)
