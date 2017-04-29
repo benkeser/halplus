@@ -5,7 +5,7 @@
 #' @param Y outcome
 #' @param X data
 #' @param newX New data to apply the model fit and generate predictions.
-#' @param family Statistical family
+#' @param family Statistical family; gaussian() and binomial() have been tested.
 #' @param verbose Set to T for more detailed output
 #' @param obsWeights observation weights
 #' @param sparseMat Use sparse matrix implementation or normal matrix
@@ -17,7 +17,8 @@
 #'   penalization).
 #' @param debug Setting to T will run garbage collection to improve the accuracy
 #'  of memory monitoring.
-#' @param parallel Use a regisered parallel backend if possible.
+#' @param parallel Use a registered parallel backend if possible.
+#' @param ... Any extra arguments (unused).
 #'
 #' @importFrom glmnet cv.glmnet
 #' @importFrom bit bit
@@ -309,7 +310,7 @@ hal <- function(Y,
                 colDups = colDups,
                 sparseMat = sparseMat
     )
-    class(fit) <- "SL.hal"
+    class(fit) <- "hal"
 
     if (identical(X, newX)) {
       if (length(dupInds) > 0) {
@@ -358,6 +359,6 @@ hal <- function(Y,
   if (debug) gc()
 
   out <- list(pred = pred, fit = fit, times = times)
-  if (verbose) cat("Done with SL.hal\n")
+  if (verbose) cat("Done with hal()\n")
   return(out)
 }
