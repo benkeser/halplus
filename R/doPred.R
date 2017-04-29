@@ -30,7 +30,7 @@ doPred <- function(object, newdata, verbose = TRUE, s) {
     myp <- c(0, rep(NA, K))
     # look at the i associatiated with
     for (k in 1:K) {
-      # this condition ensures that not all the values of a given set of duplciates
+      # this condition ensures that not all the values of a given set of duplicates
       # are equal to zero.
       if (tmp@p[startInd[k] + 1] != tmp@p[endInd[k] + 1]) {
         Fidx_base0 <- (tmp@p[startInd[k] + 1]):(tmp@p[endInd[k] + 1] - 1)
