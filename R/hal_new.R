@@ -76,8 +76,8 @@ hal <- function(Y,
   # select most relevant variables based on the supplied minimum
   if(!is.null(minVars)) {
     pvalues <- rep(NA, ncol(X))
-    for (i in 2:ncol(X)) {
-      m <- lm(Y ~ X[, 1] + X[, i], data = X) # perhaps change linear filtering later...
+    for (i in 1:ncol(X)) {
+      m <- lm(Y ~ A + X[, i], data = X) # perhaps change linear filtering later...
       p <- try(summary(m)$coef[3, 4], silent = TRUE)
       if (class(p) == "try-error") {
         pvalues[i] <- 1
@@ -85,10 +85,9 @@ hal <- function(Y,
         pvalues[i] <- p
       }
     }
-    pvalues <- pvalues[!is.na(pvalues)]
     keep <- pvalues <= alpha
     if(sum(keep) < minVars) {
-      keep[order(pvalues + 1)[1:minVars]] <- TRUE
+      keep[order(pvalues)] <- TRUE
     }
     X <- X[, keep]
   }

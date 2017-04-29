@@ -1,12 +1,18 @@
 Package: hal
 Title: Highly Adaptive Lasso
-Version: 0.1
-Authors@R: person("David", "Benkeser", email = "david.benkeser@berkeley.edu",
-                  role = c("aut", "cre"))
-Description: Highly adaptive lasso.
+Version: 0.01
+Authors@R: as.person(c(
+    "David Benkeser <benkeser@berkeley.edu> [aut, cre, cph]",
+    "Mark van der Laan <laan@berkeley.edu> [aut, cph]",
+    "Nima Hejazi <nh@nimahejazi.org> [ctb]",
+    "Chris Kennedy <chrisken@gmail.com> [ctb]",
+    "Oleg Sofrygin <oleg.sofrygin@gmail.com> [ctb]",
+    "Andre Kurepa Waschka <akwaschka@berkeley.edu> [ctb]"
+    ))
+Description: Highly adaptive LASSO estimator.
 Depends:
     R (>= 3.1.0)
-License: GPL (>= 2)
+License: MIT + file LICENSE
 LazyData: true
 Imports:
     bit,
