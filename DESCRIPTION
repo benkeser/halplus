@@ -2,9 +2,12 @@ Package: hal
 Title: Highly Adaptive Lasso
 Version: 0.1
 Authors@R: as.person(c(
-    "David Benkeser <benkeser@berkeley.edu> [aut, cre, cph]",
+    "David C. Benkeser <benkeser@berkeley.edu> [aut, cre, cph]",
+    "Mark J. van der Laan <laan@berkeley.edu> [aut]",
     "Chris Kennedy <chrisken@gmail.com> [aut]",
-    "Nima Hejazi <nhejazi@berkeley.edu> [ctb]"
+    "Nima Hejazi <nh@nimahejazi.org> [ctb]",
+    "Oleg Sofrygin <oleg.sofrygin@gmail.com> [ctb]"
+    "Andre Kurepa Waschka <akwaschka@berkeley.edu> [ctb]"
     ))
 Description: Highly adaptive LASSO estimator.
 Depends:
