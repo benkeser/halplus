@@ -27,7 +27,9 @@ SL.hal <- function(Y,
                    nlambda = 100,
                    useMin = TRUE,
                    ...) {
-  hal(Y = Y, X = X, newX = newX, family = family, verbose = verbose,
+  fit = hal(Y = Y, X = X, newX = newX, family = family, verbose = verbose,
       obsWeights = obsWeights, sparseMat = sparseMat, nfolds = nfolds,
       nlambda = nlambda, useMin = useMin, ...)
+  # Overwrite the class returned by hal().
+  class(fit) = "SL.hal"
 }
