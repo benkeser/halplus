@@ -2,12 +2,12 @@
 % Please edit documentation in R/SL.hal.R
 \name{SL.hal}
 \alias{SL.hal}
-\title{Highly Adaptive Lasso}
+\title{Highly Adaptive LASSO}
 \usage{
 SL.hal(Y, X, newX, family = gaussian(), verbose = TRUE,
   obsWeights = rep(1, length(Y)), sparseMat = TRUE,
-  nfolds = ifelse(length(Y) <= 100, 20, 10), nlambda = 100, useMin = TRUE,
-  ...)
+  nfolds = ifelse(length(Y) <= 100, 20, 10), nlambda = 100,
+  minVars = NULL, maxDim = 10, useMin = TRUE, ...)
 }
 \arguments{
 \item{Y}{outcome}
@@ -31,8 +31,8 @@ SL.hal(Y, X, newX, family = gaussian(), verbose = TRUE,
 \item{useMin}{Glmnet option - use minimum risk lambda or 1se lambda (more
 penalization).}
 
-\item{...}{Any other arguments to pass-through to hal()}
+\item{...}{Any other arguments to pass-through to \code{hal}}
 }
 \description{
-SuperLearner wrapper
+SuperLearner wrapper for the highly adaptive LASSO
 }

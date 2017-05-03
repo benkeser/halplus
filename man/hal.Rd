@@ -2,12 +2,13 @@
 % Please edit documentation in R/hal.R
 \name{hal}
 \alias{hal}
-\title{Highly Adaptive Lasso}
+\title{Highly Adaptive LASSO}
 \usage{
-hal(Y, X, newX = NULL, family = gaussian(), verbose = F,
+hal(Y, X, newX = NULL, family = gaussian(), verbose = FALSE,
   obsWeights = rep(1, length(Y)), sparseMat = TRUE,
-  nfolds = ifelse(length(Y) <= 100, 20, 10), nlambda = 100, useMin = TRUE,
-  debug = T, parallel = F, ...)
+  nfolds = ifelse(length(Y) <= 100, 20, 10), nlambda = 100,
+  minVars = NULL, maxDim = 10, useMin = TRUE, debug = TRUE,
+  parallel = FALSE, ...)
 }
 \arguments{
 \item{Y}{outcome}
@@ -16,30 +17,43 @@ hal(Y, X, newX = NULL, family = gaussian(), verbose = F,
 
 \item{newX}{New data to apply the model fit and generate predictions.}
 
-\item{family}{Statistical family; gaussian() and binomial() have been tested.}
+\item{family}{Statistical family: Gaussian and Binomial have been tested.}
 
-\item{verbose}{Set to T for more detailed output}
+\item{verbose}{Set to \code{TRUE} for more detailed output.}
 
-\item{obsWeights}{observation weights}
+\item{obsWeights}{Weights to be given to observations.}
 
-\item{sparseMat}{Use sparse matrix implementation or normal matrix
-implementation. Normal matrix implementation is old and not guaranteed to
-work correctly.}
+\item{sparseMat}{Use an implementation based on sparse matrices or normal
+(i.e., non-sparse) matrices. The normal matrix implementation is old and
+not guaranteed to work correctly (will likely be deprecated soon).}
 
-\item{nfolds}{Number of CV folds for cv.glmnet}
+\item{nfolds}{Number of cross-validation folds, passed directly to
+\code{glmnet::cv.glmnet}.}
 
-\item{nlambda}{Number of lambda values to test in cv.glmnet.}
+\item{nlambda}{Number of lambda values to test in fitting the LASSO model,
+passed directly to \code{glmnet::cv.glmnet}.}
 
-\item{useMin}{Glmnet option - use minimum risk lambda or 1se lambda (more
-penalization).}
+\item{minVars}{The minimum number of variables for which coefficients are to
+be estimated; this is used to perform variable filtering prior to fitting
+the LASSO model via cross-validation.}
 
-\item{debug}{Setting to T will run garbage collection to improve the accuracy
-of memory monitoring.}
+\item{maxDim}{The maximum tolerable dimension of the matrix of variables X.
+If the dimension of the supplied matrix X exceeds this value, then a small
+number of relevant variables are automatically selected for use with the
+cross-validated LASSO estimator. This overrides \code{minVars}.}
+
+\item{useMin}{option passed directly to \code{glmnet::cv.glmnet}: whether to
+use the value of lambda that minimimzes the mean cross-validated error or
+the largest value of lambda such that error is within 1 standard error of
+the minimum (consult help for \code{glmnet::cv.glmnet} for more info).}
+
+\item{debug}{Set to \code{TRUE} to run garbage collection (\code{gc}), to
+improve the accuracy of memory monitoring.}
 
 \item{parallel}{Use a registered parallel backend if possible.}
 
 \item{...}{Any extra arguments (unused).}
 }
 \description{
-Model fitting function.
+Model fitting function for the highly adaptive LASSO estimator.
 }
