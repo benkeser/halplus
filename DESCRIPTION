@@ -3,7 +3,7 @@ Title: Highly Adaptive Lasso
 Version: 0.01
 Authors@R: as.person(c(
     "David Benkeser <benkeser@berkeley.edu> [aut, cre, cph]",
-    "Mark van der Laan <laan@berkeley.edu> [aut]",
+    "Mark van der Laan <laan@berkeley.edu> [aut, cph]",
     "Chris Kennedy <chrisken@gmail.com> [aut]",
     "Nima Hejazi <nh@nimahejazi.org> [aut]",
     "Oleg Sofrygin <oleg.sofrygin@gmail.com> [ctb]",
