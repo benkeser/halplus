@@ -1,22 +1,26 @@
-#' Highly Adaptive Lasso
+#' Highly Adaptive LASSO
 #'
-#' Model fitting function.
+#' Model fitting function for the highly adaptive LASSO estimator.
 #'
 #' @param Y outcome
 #' @param X data
 #' @param newX New data to apply the model fit and generate predictions.
-#' @param family Statistical family; gaussian() and binomial() have been tested.
-#' @param verbose Set to T for more detailed output
-#' @param obsWeights observation weights
-#' @param sparseMat Use sparse matrix implementation or normal matrix
-#'   implementation. Normal matrix implementation is old and not guaranteed to
-#'   work correctly.
-#' @param nfolds Number of CV folds for cv.glmnet
-#' @param nlambda Number of lambda values to test in cv.glmnet.
-#' @param useMin Glmnet option - use minimum risk lambda or 1se lambda (more
-#'   penalization).
-#' @param debug Setting to T will run garbage collection to improve the accuracy
-#'  of memory monitoring.
+#' @param family Statistical family: Gaussian and Binomial have been tested.
+#' @param verbose Set to \code{TRUE} for more detailed output.
+#' @param obsWeights Weights to be given to observations.
+#' @param sparseMat Use an implementation based on sparse matrices or normal
+#'   (i.e., non-sparse) matrices. The normal matrix implementation is old and
+#'   not guaranteed to work correctly (will likely be deprecated soon).
+#' @param nfolds Number of cross-validation folds, passed directly to
+#'   \code{glmnet::cv.glmnet}.
+#' @param nlambda Number of lambda values to test in fitting the LASSO model,
+#'   passed directly to \code{glmnet::cv.glmnet}.
+#' @param useMin option passed directly to \code{glmnet::cv.glmnet}: whether to
+#'   use the value of lambda that minimimzes the mean cross-validated error or
+#'   the largest value of lambda such that error is within 1 standard error of
+#'   the minimum (consult help for \code{glmnet::cv.glmnet} for more info).
+#' @param debug Set to \code{TRUE} to run garbage collection (\code{gc}), to
+#'   improve the accuracy of memory monitoring.
 #' @param parallel Use a registered parallel backend if possible.
 #' @param ... Any extra arguments (unused).
 #'
@@ -33,14 +37,14 @@ hal <- function(Y,
                 X,
                 newX = NULL,
                 family = gaussian(),
-                verbose = F,
+                verbose = FALSE,
                 obsWeights = rep(1, length(Y)),
                 sparseMat = TRUE,
                 nfolds = ifelse(length(Y) <= 100, 20, 10),
                 nlambda = 100,
                 useMin = TRUE,
-                debug = T,
-                parallel = F,
+                debug = TRUE,
+                parallel = FALSE,
                 ... # allow extra arguments with no death
                 ) {
 
