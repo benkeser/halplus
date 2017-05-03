@@ -1,6 +1,6 @@
-#' Highly Adaptive Lasso
+#' Highly Adaptive LASSO
 #'
-#' SuperLearner wrapper
+#' SuperLearner wrapper for the highly adaptive LASSO
 #'
 #' @param Y outcome
 #' @param X data
@@ -13,7 +13,7 @@
 #' @param nlambda Number of lambda values to test in cv.glmnet.
 #' @param useMin Glmnet option - use minimum risk lambda or 1se lambda (more
 #'   penalization).
-#' @param ... Any other arguments to pass-through to hal()
+#' @param ... Any other arguments to pass-through to \code{hal}
 #'
 #' @export
 SL.hal <- function(Y,
@@ -25,9 +25,11 @@ SL.hal <- function(Y,
                    sparseMat = TRUE,
                    nfolds = ifelse(length(Y) <= 100, 20, 10),
                    nlambda = 100,
+                   minVars = NULL,
+                   maxDim = 20,
                    useMin = TRUE,
                    ...) {
   hal(Y = Y, X = X, newX = newX, family = family, verbose = verbose,
       obsWeights = obsWeights, sparseMat = sparseMat, nfolds = nfolds,
-      nlambda = nlambda, useMin = useMin, ...)
+      nlambda = nlambda,  minVars = NULL, maxDim = 20, useMin = useMin, ...)
 }

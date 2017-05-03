@@ -18,17 +18,18 @@ gendata1=function(n){
   data.frame(A,W1,W2,W3,W4,W5,W6,W7,W8,W9,W10,Y)
 }
 
-simdata1<-gendata1(250)
-Y1<-simdata1$Y
+if (!require(devtools)) install.packages(devtools)
+devtools::install_github("nhejazi/halplus")
+library(hal)
+
+
+simdata1 <- gendata1(50)
+Y1 <- simdata1$Y
 X1 <- simdata1[-12]
 
 
-
-if (!require(devtools)) install.packages(devtools)
-devtools::install_github("benkeser/halplus")
-
 ptm <- proc.time()
-halresults1<-hal(Y=Y1,X=X1)
+halresults1 <- hal(Y = Y1, X = X1, verbose = T)
 proc.time() - ptm
 #With 250 obs and 11 cov takes 239.868 seconds
 

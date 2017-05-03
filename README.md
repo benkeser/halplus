@@ -38,14 +38,15 @@ paper.](http://ieeexplore.ieee.org/ielx7/7795280/7796876/07796956.pdf?tp=&arnumb
 
 ## License
 
-&copy; 2016-2017 [David C. Benkeser](http://www.benkeserstatistics.com)
+&copy; 2016-2017 [David C. Benkeser](http://www.benkeserstatistics.com) and
+[Mark J. van der Laan](https://www.stat.berkeley.edu/~laan/)
 
 The contents of this repository are distributed under the MIT license. See
 below for details:
 ```
 The MIT License (MIT)
 
-Copyright (c) 2016-2017 David C. Benkeser
+Copyright (c) 2016-2017 David C. Benkeser & Mark J. van der Laan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

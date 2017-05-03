@@ -1,22 +1,33 @@
-#' Highly Adaptive Lasso
+#' Highly Adaptive LASSO
 #'
-#' Model fitting function.
+#' Model fitting function for the highly adaptive LASSO estimator.
 #'
 #' @param Y outcome
 #' @param X data
 #' @param newX New data to apply the model fit and generate predictions.
-#' @param family Statistical family; gaussian() and binomial() have been tested.
-#' @param verbose Set to T for more detailed output
-#' @param obsWeights observation weights
-#' @param sparseMat Use sparse matrix implementation or normal matrix
-#'   implementation. Normal matrix implementation is old and not guaranteed to
-#'   work correctly.
-#' @param nfolds Number of CV folds for cv.glmnet
-#' @param nlambda Number of lambda values to test in cv.glmnet.
-#' @param useMin Glmnet option - use minimum risk lambda or 1se lambda (more
-#'   penalization).
-#' @param debug Setting to T will run garbage collection to improve the accuracy
-#'  of memory monitoring.
+#' @param family Statistical family: Gaussian and Binomial have been tested.
+#' @param verbose Set to \code{TRUE} for more detailed output.
+#' @param obsWeights Weights to be given to observations.
+#' @param sparseMat Use an implementation based on sparse matrices or normal
+#'   (i.e., non-sparse) matrices. The normal matrix implementation is old and
+#'   not guaranteed to work correctly (will likely be deprecated soon).
+#' @param nfolds Number of cross-validation folds, passed directly to
+#'   \code{glmnet::cv.glmnet}.
+#' @param nlambda Number of lambda values to test in fitting the LASSO model,
+#'   passed directly to \code{glmnet::cv.glmnet}.
+#' @param minVars The minimum number of variables for which coefficients are to
+#'   be estimated; this is used to perform variable filtering prior to fitting
+#'   the LASSO model via cross-validation.
+#' @param maxDim The maximum tolerable dimension of the matrix of variables X.
+#'   If the dimension of the supplied matrix X exceeds this value, then a small
+#'   number of relevant variables are automatically selected for use with the
+#'   cross-validated LASSO estimator. This overrides \code{minVars}.
+#' @param useMin option passed directly to \code{glmnet::cv.glmnet}: whether to
+#'   use the value of lambda that minimimzes the mean cross-validated error or
+#'   the largest value of lambda such that error is within 1 standard error of
+#'   the minimum (consult help for \code{glmnet::cv.glmnet} for more info).
+#' @param debug Set to \code{TRUE} to run garbage collection (\code{gc}), to
+#'   improve the accuracy of memory monitoring.
 #' @param parallel Use a registered parallel backend if possible.
 #' @param ... Any extra arguments (unused).
 #'
@@ -29,22 +40,26 @@
 #' @importFrom stringr str_c str_replace_na
 #'
 #' @export
+#' 
 hal <- function(Y,
                 X,
                 newX = NULL,
                 family = gaussian(),
-                verbose = F,
+                verbose = FALSE,
                 obsWeights = rep(1, length(Y)),
                 sparseMat = TRUE,
                 nfolds = ifelse(length(Y) <= 100, 20, 10),
                 nlambda = 100,
+                minVars = NULL,
+                maxDim = 20,
                 useMin = TRUE,
-                debug = T,
-                parallel = F,
+                debug = TRUE,
+                parallel = FALSE,
                 ... # allow extra arguments with no death
                 ) {
 
   d <- ncol(X)
+  alpha <- 0.05
 
   # Run garbage collection if we are in debug mode.
   if (debug) gc()
@@ -52,6 +67,30 @@ hal <- function(Y,
   # Initialize prediction object to null in case newX = NULL.
   pred = NULL
   times = NULL
+  
+  # set minimum number of variables automatically if dimension is too high
+  if(is.null(minVars) & (d > maxDim)) {
+    minVars <- 5 # what's a good cutoff?
+  }
+  
+  # select most relevant variables based on the supplied minimum
+  if(!is.null(minVars)) {
+    pvalues <- rep(NA, ncol(X))
+    for (i in 1:ncol(X)) {
+      m <- lm(Y ~ A + X[, i], data = X) # perhaps change linear filtering later...
+      p <- try(summary(m)$coef[3, 4], silent = TRUE)
+      if (class(p) == "try-error") {
+        pvalues[i] <- 1
+      } else {
+        pvalues[i] <- p
+      }
+    }
+    keep <- pvalues <= alpha
+    if(sum(keep) < minVars) {
+      keep[order(pvalues)[1:minVars]] <- TRUE
+    }
+    X <- X[, keep]
+  }
 
   if (!sparseMat) {
     uniList <- plyr::alply(as.matrix(X), 2, function(x) {
@@ -83,19 +122,17 @@ hal <- function(Y,
       designX <- initX[, !dup]
     }
 
-    fitCV <-
-      glmnet::cv.glmnet(
-        x = designX,
-        y = Y,
-        weights = obsWeights,
-        lambda.min.ratio = 0.001,
-        lambda = NULL,
-        type.measure = "deviance",
-        nfolds = nfolds,
-        family = family$family,
-        alpha = 1,
-        nlambda = nlambda
-      )
+    fitCV <- glmnet::cv.glmnet(x = designX,
+                               y = Y,
+                               weights = obsWeights,
+                               lambda.min.ratio = 0.001,
+                               lambda = NULL,
+                               type.measure = "deviance",
+                               nfolds = nfolds,
+                               family = family$family,
+                               alpha = 1,
+                               nlambda = nlambda
+                              )
 
     fit <- list(object = fitCV,
                 useMin = useMin,
@@ -195,19 +232,19 @@ hal <- function(Y,
     # Each column in X.init will be represented by a unique vector of integers.
     # Each indicator column in X.init will be converted to a row of integers or a string of cat'ed integers in data.table
     # The number of integers needed to represent a single column is determined automatically by package "bit" and it depends on nrow(X.init)
-    nbits <-
-      nrow(X.init) # number of bits (0/1) used by each column in X.init
-    bitvals <-
-      bit(length = nbits) # initial allocation (all 0/FALSE)
-    nints_used <-
-      length(unclass(bitvals)) # number of integers needed to represent each column
+    nbits <- nrow(X.init) # number of bits (0/1) used by each column in X.init
+    
+    bitvals <- bit::bit(length = nbits) # initial allocation (all 0/FALSE)
+    
+    nints_used <- length(unclass(bitvals)) # number of integers needed to represent each column
 
+    
     # Track which results gave NA in one of the integers
     ID_withNA <- NULL
 
     # For loop over columns of X.init
     for (i in 1:nIndCols) {
-      bitvals <- bit(length = nbits) # initial allocation (all 0/FALSE)
+      bitvals <- bit::bit(length = nbits) # initial allocation (all 0/FALSE)
       Fidx_base0 <-
         (X.init@p[i]):(X.init@p[i + 1] - 1) # zero-base indices of indices of non-zero rows for column i=1
       nonzero_rows <-
@@ -218,10 +255,10 @@ hal <- function(Y,
       # str(bitwhich(bitvals))
       intval <-
         unclass(bitvals) # integer representation of the bit vector
-      # stringval <- str_c(intval, collapse = "")
+      # stringval <- stringr::str_c(intval, collapse = "")
       if (any(is.na(intval)))
         ID_withNA <- c(ID_withNA, i)
-      data.table::set(datDT, i, 2L, value = str_c(str_replace_na(intval), collapse = ""))
+      data.table::set(datDT, i, 2L, value = stringr::str_c(stringr::str_replace_na(intval), collapse = ""))
     }
     # create a hash-key on the string representation of the column,
     # sorts it by bit_to_int_to_str using radix sort:
