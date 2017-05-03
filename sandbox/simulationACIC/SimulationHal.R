@@ -31,12 +31,13 @@ X1 <- simdata1[-12]
 ptm <- proc.time()
 halresults1 <- hal(Y = Y1,
                    X = X1,
-                   verbose = TRUE)
+                   verbose = TRUE,
+                   minVars = 5)
 proc.time() - ptm
 #With 250 obs and 11 cov takes 239.868 seconds
 
 ptm <- proc.time()
-SL_lib <- c(c("SL.hal"), c("SL.glm"))
+SL_lib <- c(c("SL.hal", "screen.hal"), c("SL.glm"))
 sl_halresults1 <- SuperLearner(Y = Y1, X = X1,
                                SL.library = SL_lib,
                                verbose = TRUE)

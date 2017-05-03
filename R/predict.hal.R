@@ -121,4 +121,4 @@ predict.hal <-
       }
     }
     return(as.numeric(pred))
-  }
+}

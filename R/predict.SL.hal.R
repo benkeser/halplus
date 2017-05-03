@@ -7,5 +7,6 @@ predict.SL.hal = function(object,
                           chunks = 1000,
                           s = ifelse(object$useMin, object$object$lambda.min, object$object$lambda.1se),
                           ...) {
-  predict(object, newdata, bigDesign, verbose, chunks, s, ...)
+  pred <- predict(object, newdata, bigDesign, verbose, chunks, s, ...)
+  out <- list(pred = pred, fit = object$fit)
 }
