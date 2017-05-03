@@ -32,4 +32,7 @@ SL.hal <- function(Y,
   hal(Y = Y, X = X, newX = newX, family = family, verbose = verbose,
       obsWeights = obsWeights, sparseMat = sparseMat, nfolds = nfolds,
       nlambda = nlambda,  minVars = NULL, maxDim = 20, useMin = useMin, ...)
+  out <- list(hal)
+  class(out) <- "SL.hal"
+  return(out)
 }

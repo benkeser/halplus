@@ -33,6 +33,12 @@ halresults1 <- hal(Y = Y1, X = X1, verbose = T)
 proc.time() - ptm
 #With 250 obs and 11 cov takes 239.868 seconds
 
+ptm <- proc.time()
+SL_lib <- c("SL.hal", "screen.hal")
+sl_halresults1 <- SuperLearner(Y = Y1, X = X1,
+                               SL.library = SL_lib,
+                               verbose = TRUE)
+proc.time() - ptm
 
 ################################################################
 #10 covariates

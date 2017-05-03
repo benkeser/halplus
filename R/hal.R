@@ -51,7 +51,7 @@ hal <- function(Y,
                 nfolds = ifelse(length(Y) <= 100, 20, 10),
                 nlambda = 100,
                 minVars = NULL,
-                maxDim = 20,
+                maxDim = 10,
                 useMin = TRUE,
                 debug = TRUE,
                 parallel = FALSE,
@@ -70,14 +70,14 @@ hal <- function(Y,
   
   # set minimum number of variables automatically if dimension is too high
   if(is.null(minVars) & (d > maxDim)) {
-    minVars <- 5 # what's a good cutoff?
+    minVars <- maxDim # what's a good cutoff?
   }
   
   # select most relevant variables based on the supplied minimum
   if(!is.null(minVars)) {
     pvalues <- rep(NA, ncol(X))
-    for (i in 1:ncol(X)) {
-      m <- lm(Y ~ A + X[, i], data = X) # perhaps change linear filtering later...
+    for (i in 2:ncol(X)) {
+      m <- lm(Y ~ X[, 1] + X[, i], data = X) # perhaps change linear filtering later...
       p <- try(summary(m)$coef[3, 4], silent = TRUE)
       if (class(p) == "try-error") {
         pvalues[i] <- 1
@@ -85,9 +85,10 @@ hal <- function(Y,
         pvalues[i] <- p
       }
     }
+    pvalues <- pvalues[!is.na(pvalues)]
     keep <- pvalues <= alpha
     if(sum(keep) < minVars) {
-      keep[order(pvalues)[1:minVars]] <- TRUE
+      keep[order(pvalues + 1)[1:minVars]] <- TRUE
     }
     X <- X[, keep]
   }
@@ -227,8 +228,7 @@ hal <- function(Y,
     nIndCols <- ncol(X.init)
     # Pre-allocate a data.table with one column, each row will store a single column from X.init
     datDT <-
-      data.table(ID = 1:nIndCols,
-                 bit_to_int_to_str = rep.int("0", nIndCols))
+      data.table::data.table(ID = 1:nIndCols, bit_to_int_to_str = rep.int("0", nIndCols))
     # Each column in X.init will be represented by a unique vector of integers.
     # Each indicator column in X.init will be converted to a row of integers or a string of cat'ed integers in data.table
     # The number of integers needed to represent a single column is determined automatically by package "bit" and it depends on nrow(X.init)
