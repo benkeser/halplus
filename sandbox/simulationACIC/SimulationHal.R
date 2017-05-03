@@ -19,8 +19,8 @@ gendata1=function(n){
 }
 
 if (!require(devtools)) install.packages(devtools)
-devtools::install_github("nhejazi/halplus")
-library(hal)
+if (!require(hal)) devtools::install_github("nhejazi/halplus")
+if (!require(SuperLearner)) devtools::install_github("ecpolley/SuperLearner")
 
 
 simdata1 <- gendata1(50)
@@ -29,10 +29,19 @@ X1 <- simdata1[-12]
 
 
 ptm <- proc.time()
-halresults1 <- hal(Y = Y1, X = X1, verbose = T)
+halresults1 <- hal(Y = Y1,
+                   X = X1,
+                   verbose = TRUE)
 proc.time() - ptm
 # With 250 obs and 10 cov takes 239.868 seconds
 
+ptm <- proc.time()
+SL_lib <- c("hal", "screen.hal")
+sl_halresults <- SuperLearner(Y = Y1,
+                              X = X1,
+                              SL.library = SL_lib,
+                              verbose = TRUE)
+proc.time() - ptm
 
 
 

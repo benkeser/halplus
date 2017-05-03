@@ -1,8 +1,7 @@
 #' @importFrom plyr alply
 #' @importFrom stats predict
 #' @export
-predict.SL.hal <-
-  function(object,
+predict.SL.hal <- function(object,
            newdata,
            bigDesign = FALSE,
            verbose = TRUE,
