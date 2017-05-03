@@ -26,10 +26,13 @@ SL.hal <- function(Y,
                    nfolds = ifelse(length(Y) <= 100, 20, 10),
                    nlambda = 100,
                    minVars = NULL,
-                   maxDim = 20,
+                   maxDim = 10,
                    useMin = TRUE,
                    ...) {
-  hal(Y = Y, X = X, newX = newX, family = family, verbose = verbose,
+  result = hal(Y = Y, X = X, newX = newX, family = family, verbose = verbose,
       obsWeights = obsWeights, sparseMat = sparseMat, nfolds = nfolds,
-      nlambda = nlambda,  minVars = NULL, maxDim = 20, useMin = useMin, ...)
+      nlambda = nlambda,  minVars = minVars, maxDim = maxDim, useMin = useMin, ...)
+
+  # Overwrite the class returned by hal().
+  class(result$fit) = "SL.hal"
 }
