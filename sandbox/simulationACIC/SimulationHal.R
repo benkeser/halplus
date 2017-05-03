@@ -20,11 +20,11 @@ gendata1=function(n){
 
 if (!require(devtools)) install.packages(devtools)
 devtools::install_github("nhejazi/halplus")
-library(halplus)
+library(hal)
 
 
 simdata1 <- gendata1(50)
-Y1<-simdata1$Y
+Y1 <- simdata1$Y
 X1 <- simdata1[-12]
 
 
