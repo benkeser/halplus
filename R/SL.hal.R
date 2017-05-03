@@ -32,5 +32,6 @@ SL.hal <- function(Y,
       nlambda = nlambda, useMin = useMin, ...)
 
   # Overwrite the class returned by hal().
-  class(result$fit) = "SL.hal"
+  # TODO: this needs to be revised once the hal() result is improved.
+  class(result$fit$object) = "SL.hal"
 }
