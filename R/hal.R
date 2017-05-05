@@ -11,7 +11,6 @@
 #' streamline this process to the largest extent possible; however, for the time being implementing
 #' with values of n and d such that n(2^d - 1) > 1e7 is not recommended. 
 #'
-<<<<<<< HEAD
 #' @param Y A \code{numeric} of outcomes
 #' @param X A \code{data.frame} of predictors
 #' @param newX Optional \code{data.frame} on which to return predicted values
