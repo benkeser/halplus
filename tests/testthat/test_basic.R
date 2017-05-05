@@ -19,7 +19,6 @@ hal.fit <- hal(
     Y = y,
     # Restrict to d covariates for testing purposes.
     X = x,
-    family = gaussian(),
     verbose = TRUE
 )
 
