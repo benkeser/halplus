@@ -16,13 +16,15 @@ hal(Y, X, newX = NULL, family = gaussian(), verbose = F,
 
 \item{newX}{New data to apply the model fit and generate predictions.}
 
-\item{family}{Statistical family}
+\item{family}{Statistical family; gaussian() and binomial() have been tested.}
 
 \item{verbose}{Set to T for more detailed output}
 
 \item{obsWeights}{observation weights}
 
-\item{sparseMat}{Use sparse matrix implementation or normal matrix implementation.}
+\item{sparseMat}{Use sparse matrix implementation or normal matrix
+implementation. Normal matrix implementation is old and not guaranteed to
+work correctly.}
 
 \item{nfolds}{Number of CV folds for cv.glmnet}
 
@@ -34,9 +36,10 @@ penalization).}
 \item{debug}{Setting to T will run garbage collection to improve the accuracy
 of memory monitoring.}
 
-\item{parallel}{Use a regisered parallel backend if possible.}
+\item{parallel}{Use a registered parallel backend if possible.}
+
+\item{...}{Any extra arguments (unused).}
 }
 \description{
 Model fitting function.
 }
-

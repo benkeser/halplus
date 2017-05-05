@@ -26,13 +26,12 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
   colStart <- 1
   colEnd <- d
 
-  # start by creating a list of univariate indicators
-  # length of the list is d and the entries are matrices
-  # of row and column indices for a design matrix based
-  # only on that covariate, i.e. columns in each list entry
-  # run from 1:n, so we can use intersect later for higher
-  # order terms.
-  if (verbose) cat("Making ", d, " basis fns of dimension  1 \n")
+  # Start by creating a list of univariate indicators.
+  # The length of the list is d and the entries are matrices of row and column
+  # indices for a design matrix based only on that covariate, i.e. columns in
+  # each list entry run from 1:n, so we can use intersect later for higher order
+  # terms.
+  if (verbose) cat("Making", d, "basis functions of dimension 1\n")
 
   uni <- plyr::alply(matrix(1:d), 1, function(x) {
     j <- plyr::alply(matrix(newX[, x]), 1, function(y) {
@@ -41,6 +40,7 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
     i <- rep(1:n, unlist(lapply(j, length), use.names = FALSE))
     cbind(unlist(i, use.names = FALSE), unlist(j, use.names = FALSE))
   })
+
   # number of 1's for each variable -- for variables with
   # length(unique(x)) == length(x) will be n*(n+1)/2, but if there
   # are ties, the length will be different
@@ -58,20 +58,21 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
   i <- uni.ij[, 1]
   j <- uni.ij[, 2]
 
-  # loop over higher order terms
+  # Loop over higher order terms.
   if (d > 1) {
     for (k in 2:d) {
-      # matrix of all d choose k combinations
-      combos <- combn(d, k)
 
-      if (verbose) cat("Making ", ncol(combos), " basis fns of dimension ", k, "\n")
-      # adjust column indicators for column indices
-      colStart <- colEnd + 1
-      colEnd <- (colStart - 1) + ncol(combos)
+      # Matrix of all d choose k combinations.
+      combos <- utils::combn(d, k)
 
-      # list of length d choose k, each entry
-      # containing n indices of columns corresponding to subjects
-      j.list <- plyr::alply(combos, 2, function(a) {
+      if (verbose) cat("Making", ncol(combos), "basis functions of dimension", k, "\n")
+
+      # Adjust column indicators for column indices.
+      colStart <- colEnd + 1L
+      colEnd <- (colStart - 1L) + ncol(combos)
+
+      # This is the primary cause of execution time and memory usage.
+      j.list <- plyr::alply(combos, 2L, function(a) {
         .getIntersect(uni[a])
       })
 
@@ -96,7 +97,11 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
         rep.int((colStart:colEnd) - 1, times = unlist(nper, use.names =
                                                         FALSE)) * nX
 
-      # put it together
+      # Put it together
+      # CK: this is dynamic memory allocation - pre-allocating would be much better if possible.
+      # Can we determine what the size will be in advance, or no?
+      # DB: I need to think on this some more. The code above is a hot mess and I should've 
+      # documented better. Is the dynamic memory allocation hurting?
       i <- c(i, thisi)
       j <- c(j, thisj)
     }

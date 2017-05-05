@@ -19,10 +19,12 @@ library(foreach)
 
 # Use doMC if possible, otherwise doParallel
 if (require(doMC)) {
-  doMC::registerDoMC()
+  # Use only 2 cores to satisfy CRAN check.
+  doMC::registerDoMC(2)
   cl = NULL
 } else {
-  cl = parallel::makeCluster()
+  # Use only 2 cores to satisfy CRAN check.
+  cl = parallel::makeCluster(2)
   registerDoParallel(cl)
 }
 

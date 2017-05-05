@@ -1,0 +1,55 @@
+# .travis.yml for R projects.
+# See https://docs.travis-ci.com/user/languages/r/
+
+language: r
+
+# Enable if a more recent version of Ubuntu is helpful.
+# This gives us g++-4.8, which is needed for C++11 (e.g. ranger package)
+dist: trusty
+
+# Disable sudo so that we can use container infrastructure and package caching.
+sudo: false
+# Enable sudo so that we can use apt-get to upgrade and install linux packages.
+# We also need sudo for r_binary_packages listed below.
+# sudo: required
+
+# This only works if sudo = false.
+cache: packages
+
+r:
+  # Test current version of R, dev version, and previous major verison.
+  - release
+  #- devel
+  #- oldrel
+
+os:
+  - linux
+  #- osx
+
+compiler:
+  - gcc
+  #- clang
+
+env:
+  global:
+    - CRAN="http://cran.rstudio.com"
+    - R_BUILD_ARGS="--no-build-vignettes --no-manual"
+    - R_CHECK_TIME="TRUE"
+    - R_CHECK_TESTS="TRUE"
+    # This does not appear to do anything.
+    - MAKEFLAGS="-j 2"
+    # No error if suggested packages are not available.
+    #- _R_CHECK_FORCE_SUGGESTS_=0
+
+warnings_are_errors: true
+r_check_args: "--no-build-vignettes --no-manual --as-cran --timings"
+
+r_github_packages:
+  - jimhester/covr
+ #- jimhester/lintr
+
+after_success:
+  - Rscript -e 'covr::codecov()'
+
+after_failure:
+  - ./travis-tool.sh dump_logs

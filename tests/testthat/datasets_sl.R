@@ -1,7 +1,9 @@
 library(hal)
 library(testthat)
 
-# TODO: write basic test of HAL functionality.
+# NOTE: this is very slow, so we don't want testthat() to run it automatically.
+# Hence why the filename does not begin with "test_".
+
 context("All datasets")
 
 # Source other SL functions

@@ -1,7 +1,8 @@
 library(hal)
 library(testthat)
+library(SuperLearner)
 
-context("Basic test")
+context("SuperLearner")
 
 # Number of covariates to use
 d <- 3
@@ -14,14 +15,6 @@ set.seed(1)
 x = data.frame(matrix(rnorm(n * d), ncol = d))
 y = rnorm(n, rowSums(x))
 
-# Fit hal
-hal.fit <- hal(
-    Y = y,
-    # Restrict to d covariates for testing purposes.
-    X = x,
-    family = gaussian(),
-    verbose = TRUE
-)
-
-# Review timing
-hal.fit$times
+sl = SuperLearner(y, x, SL.library = c("SL.mean", "SL.hal", "SL.glm"),
+                  family = gaussian())
+print(sl)

@@ -11,6 +11,7 @@
 #' streamline this process to the largest extent possible; however, for the time being implementing
 #' with values of n and d such that n(2^d - 1) > 1e7 is not recommended. 
 #'
+<<<<<<< HEAD
 #' @param Y A \code{numeric} of outcomes
 #' @param X A \code{data.frame} of predictors
 #' @param newX Optional \code{data.frame} on which to return predicted values
@@ -208,10 +209,38 @@ hal <- function(Y,
       parallel = parallel
     )
   }
+    class(fit) <- "hal"
 
-  time_lasso_end = proc.time()
+    if (identical(X, newX)) {
+      if (length(dupInds) > 0) {
+        pred <-
+          predict(
+            fitCV,
+            newx = X.init[, c(keepDupInds, notDupInds)],
+            s = ifelse(useMin, fitCV$lambda.min, fitCV$lambda.1se),
+            type = "response"
+          )
+      } else{
+        pred <-
+          predict(
+            fitCV,
+            newx = X.init,
+            s = ifelse(useMin, fitCV$lambda.min, fitCV$lambda.1se),
+            type = "response"
+          )
+      }
+    } else if (!is.null(newX)) {
+      pred <- predict(fit,
+                      newdata = newX,
+                      bigDesign = FALSE,
+                      chunks = 10000)
+    }
 
-  time_lasso = time_lasso_end - time_dup_end
+  time_pred_end <- proc.time()
+  time_pred <- time_pred_end - time_lasso_end
+  time_lasso_end <- proc.time()
+
+  time_lasso <- time_lasso_end - time_dup_end
 
   #------------------------------------------------------------  
   # Initial output object (pred and times added below)
