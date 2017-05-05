@@ -1,4 +1,5 @@
 #' Quick pass-through.
+#' @export
 predict.SL.hal = function(object,
                           newdata,
                           bigDesign = FALSE,
