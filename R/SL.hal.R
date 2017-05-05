@@ -1,18 +1,16 @@
 #' Highly Adaptive Lasso
 #'
-#' SuperLearner wrapper
+#' SuperLearner wrapper for \code{hal}.
 #'
-#' @param Y outcome
-#' @param X data
-#' @param newX New data to apply the model fit and generate predictions.
-#' @param family Statistical family
-#' @param verbose Set to T for more detailed output
-#' @param obsWeights observation weights
-#' @param sparseMat Use sparse matrix implementation or normal matrix implementation.
-#' @param nfolds Number of CV folds for cv.glmnet
-#' @param nlambda Number of lambda values to test in cv.glmnet.
-#' @param useMin Glmnet option - use minimum risk lambda or 1se lambda (more
-#'   penalization).
+#' @param Y A \code{numeric} of outcomes
+#' @param X A \code{data.frame} of predictors
+#' @param newX Optional \code{data.frame} on which to return predicted values
+#' @param verbose A \code{boolean} indicating whether to print output on functions progress
+#' @param obsWeights Optional \code{vector} of observation weights to be passed to \code{cv.glmnet}
+#' @param nfolds Number of CV folds passed to \code{cv.glmnet}
+#' @param nlambda Number of lambda values to search across in \code{cv.glmnet}
+#' @param useMin Option passed to \code{cv.glmnet}, use minimum risk lambda or 1se lambda (more
+#'   penalization)
 #' @param ... Any other arguments to pass-through to hal()
 #'
 #' @export
@@ -22,12 +20,36 @@ SL.hal <- function(Y,
                    family = gaussian(),
                    verbose = TRUE,
                    obsWeights = rep(1, length(Y)),
-                   sparseMat = TRUE,
                    nfolds = ifelse(length(Y) <= 100, 20, 10),
                    nlambda = 100,
                    useMin = TRUE,
                    ...) {
-  hal(Y = Y, X = X, newX = newX, family = family, verbose = verbose,
-      obsWeights = obsWeights, sparseMat = sparseMat, nfolds = nfolds,
+      halOut <- hal(Y = Y, X = X, newX = newX, verbose = verbose,
+      obsWeights = obsWeights, nfolds = nfolds,
       nlambda = nlambda, useMin = useMin, ...)
+
+      out <- list(object = halOut, pred = halOut$pred)
+      class(out) <- "SL.hal"
+
+      return(out)
 }
+
+#' predict.SL.hal
+#' 
+#' predict method for \code{SL.hal}
+#' 
+#' @param object A fitted object of class \code{hal}
+#' @param newdata A matrix of new predictions to obtain predictions
+#' @param bigDesign A boolean indicating whether to obtain predictions all at once
+#' (which may be memory intractable) or to split up the task into smaller chunks
+#' @param chunks A numeric indicating how many chunks to split the prediction task into
+#' (if \code{bigDesign = FALSE})
+#' 
+#' @importFrom stats predict
+#' @export 
+predict.SL.hal <- function(object, newdata, bigDesign = FALSE, nChunks = 50, ...){
+      pred <- stats::predict(object$object, newdata = newdata, bigDesign = bigDesign, 
+                      nChunks = nChunks)
+      return(pred)
+}
+

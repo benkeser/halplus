@@ -1,5 +1,15 @@
-#' @importFrom plyr llply
+#' makeSparseMat
+#' 
+#' Function to create a sparse design matrix of basis functions
+#' based on a matrix of predictors.
+#' 
+#' @param X A \code{data.frame} of predictors
+#' @param newX Optional \code{data.frame} on which to return predicted values
+#' @param verbose A \code{boolean} indicating whether to print output on functions progress
+
+#' @importFrom plyr llply alply
 # TODO: don't always have a newX.
+
 makeSparseMat <- function(X, newX = X, verbose = TRUE) {
 
   if (is.vector(X)) X <- matrix(X, ncol = 1)
@@ -24,8 +34,8 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
   # order terms.
   if (verbose) cat("Making ", d, " basis fns of dimension  1 \n")
 
-  uni <- alply(matrix(1:d), 1, function(x) {
-    j <- alply(matrix(newX[, x]), 1, function(y) {
+  uni <- plyr::alply(matrix(1:d), 1, function(x) {
+    j <- plyr::alply(matrix(newX[, x]), 1, function(y) {
       which(X[, x] <= y)
     })
     i <- rep(1:n, unlist(lapply(j, length), use.names = FALSE))
@@ -48,34 +58,6 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
   i <- uni.ij[, 1]
   j <- uni.ij[, 2]
 
-  # functions used for higher order terms
-  .myIntersect <- function(...) {
-    Reduce(intersect, list(...))
-  }
-
-  .getIntersect <- function(...) {
-    tmp <- lapply(..., function(b) {
-      split(b[, 2], b[, 1])
-    })
-    tmpNames <- lapply(tmp, function(l) {
-      as.numeric(names(l))
-    })
-    overlap <- Reduce(intersect, tmpNames)
-
-    # indices of tmp that overlap
-    newtmp <- lapply(tmp, function(b) {
-      b[paste(overlap)]
-    })
-
-    # get intersection
-    out <- eval(parse(text = paste0(
-      paste0("mapply(.myIntersect,"),
-      paste0("newtmp[[", 1:length(tmp), "]]", collapse = ","),
-      ",SIMPLIFY=FALSE)"
-    )))
-    out
-  }
-
   # loop over higher order terms
   if (d > 1) {
     for (k in 2:d) {
@@ -89,7 +71,7 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
 
       # list of length d choose k, each entry
       # containing n indices of columns corresponding to subjects
-      j.list <- alply(combos, 2, function(a) {
+      j.list <- plyr::alply(combos, 2, function(a) {
         .getIntersect(uni[a])
       })
 
@@ -129,4 +111,43 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
       dims = c(n, nX * (2 ^ d - 1))
     )
   return(grbg)
+}
+
+
+#' myIntersect
+#' 
+#' Helper function for higher order interaction basis functions.
+#' 
+#' @param ... Arguments passed to intersect
+#' 
+.myIntersect <- function(...) {
+  Reduce(intersect, list(...))
+}
+
+#' getIntersect 
+#' 
+#' Heper function for higher order interaction basis functions.
+#' 
+#' @param ... Arguments passed to \code{lapply}
+.getIntersect <- function(...) {
+  tmp <- lapply(..., function(b) {
+    split(b[, 2], b[, 1])
+  })
+  tmpNames <- lapply(tmp, function(l) {
+    as.numeric(names(l))
+  })
+  overlap <- Reduce(intersect, tmpNames)
+
+  # indices of tmp that overlap
+  newtmp <- lapply(tmp, function(b) {
+    b[paste(overlap)]
+  })
+
+  # get intersection
+  out <- eval(parse(text = paste0(
+    paste0("mapply(.myIntersect,"),
+    paste0("newtmp[[", 1:length(tmp), "]]", collapse = ","),
+    ",SIMPLIFY=FALSE)"
+  )))
+  out
 }
