@@ -3,3 +3,6 @@
 ^\.Rproj\.user$
 ^sandbox$
 ^docs$
+^appveyor\.yml$
+^codecov\.yml$
+^.travis\.yml$
