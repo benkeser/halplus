@@ -1,6 +1,6 @@
-#' Highly Adaptive LASSO
+#' Highly Adaptive Lasso
 #'
-#' SuperLearner wrapper for the highly adaptive LASSO
+#' SuperLearner wrapper
 #'
 #' @param Y outcome
 #' @param X data
@@ -13,7 +13,7 @@
 #' @param nlambda Number of lambda values to test in cv.glmnet.
 #' @param useMin Glmnet option - use minimum risk lambda or 1se lambda (more
 #'   penalization).
-#' @param ... Any other arguments to pass-through to \code{hal}
+#' @param ... Any other arguments to pass-through to hal()
 #'
 #' @export
 SL.hal <- function(Y,
@@ -25,15 +25,15 @@ SL.hal <- function(Y,
                    sparseMat = TRUE,
                    nfolds = ifelse(length(Y) <= 100, 20, 10),
                    nlambda = 100,
-                   minVars = NULL,
-                   maxDim = 10,
                    useMin = TRUE,
                    ...) {
   result = hal(Y = Y, X = X, newX = newX, family = family, verbose = verbose,
       obsWeights = obsWeights, sparseMat = sparseMat, nfolds = nfolds,
-      nlambda = nlambda,  minVars = minVars, maxDim = maxDim, useMin = useMin, ...)
+      nlambda = nlambda, useMin = useMin, ...)
 
   # Overwrite the class returned by hal().
   # TODO: this needs to be revised once the hal() result is improved.
-  class(result$fit$object) = "SL.hal"
+  class(result$fit) = "SL.hal"
+
+  result
 }
