@@ -1,0 +1,400 @@
+#' Highly Adaptive LASSO
+#'
+#' Model fitting function for the highly adaptive LASSO estimator.
+#'
+#' @param Y outcome
+#' @param X data
+#' @param newX New data to apply the model fit and generate predictions.
+#' @param family Statistical family: Gaussian and Binomial have been tested.
+#' @param verbose Set to \code{TRUE} for more detailed output.
+#' @param obsWeights Weights to be given to observations.
+#' @param sparseMat Use an implementation based on sparse matrices or normal
+#'   (i.e., non-sparse) matrices. The normal matrix implementation is old and
+#'   not guaranteed to work correctly (will likely be deprecated soon).
+#' @param nfolds Number of cross-validation folds, passed directly to
+#'   \code{glmnet::cv.glmnet}.
+#' @param nlambda Number of lambda values to test in fitting the LASSO model,
+#'   passed directly to \code{glmnet::cv.glmnet}.
+#' @param minVars The minimum number of variables for which coefficients are to
+#'   be estimated; this is used to perform variable filtering prior to fitting
+#'   the LASSO model via cross-validation.
+#' @param maxDim The maximum tolerable dimension of the matrix of variables X.
+#'   If the dimension of the supplied matrix X exceeds this value, then a small
+#'   number of relevant variables are automatically selected for use with the
+#'   cross-validated LASSO estimator. This overrides \code{minVars}.
+#' @param useMin option passed directly to \code{glmnet::cv.glmnet}: whether to
+#'   use the value of lambda that minimimzes the mean cross-validated error or
+#'   the largest value of lambda such that error is within 1 standard error of
+#'   the minimum (consult help for \code{glmnet::cv.glmnet} for more info).
+#' @param debug Set to \code{TRUE} to run garbage collection (\code{gc}), to
+#'   improve the accuracy of memory monitoring.
+#' @param parallel Use a registered parallel backend if possible.
+#' @param ... Any extra arguments (unused).
+#'
+#' @importFrom glmnet cv.glmnet
+#' @importFrom bit bit
+#' @importFrom stats gaussian predict
+#' @importFrom utils combn
+#' @importFrom data.table data.table set setkey
+#' @importFrom plyr alply
+#' @importFrom stringr str_c str_replace_na
+#'
+#' @export
+#' 
+hal <- function(Y,
+                X,
+                newX = NULL,
+                family = gaussian(),
+                verbose = FALSE,
+                obsWeights = rep(1, length(Y)),
+                sparseMat = TRUE,
+                nfolds = ifelse(length(Y) <= 100, 20, 10),
+                nlambda = 100,
+                minVars = NULL,
+                maxDim = 10,
+                useMin = TRUE,
+                debug = TRUE,
+                parallel = FALSE,
+                ... # allow extra arguments with no death
+                ) {
+
+  d <- ncol(X)
+  alpha <- 0.05
+
+  # Run garbage collection if we are in debug mode.
+  if (debug) gc()
+
+  # Initialize prediction object to null in case newX = NULL.
+  pred = NULL
+  times = NULL
+  
+  # set minimum number of variables automatically if dimension is too high
+  if(is.null(minVars) & (d > maxDim)) {
+    minVars <- maxDim # what's a good cutoff?
+  }
+  
+  # select most relevant variables based on the supplied minimum
+  if(!is.null(minVars)) {
+    pvalues <- rep(NA, ncol(X))
+    for (i in 1:ncol(X)) {
+      m <- lm(Y ~ A + X[, i], data = X) # perhaps change linear filtering later...
+      p <- try(summary(m)$coef[3, 4], silent = TRUE)
+      if (class(p) == "try-error") {
+        pvalues[i] <- 1
+      } else {
+        pvalues[i] <- p
+      }
+    }
+    keep <- pvalues <= alpha
+    if(sum(keep) < minVars) {
+      keep[order(pvalues)] <- TRUE
+    }
+    X <- X[, keep]
+  }
+
+  if (!sparseMat) {
+    uniList <- plyr::alply(as.matrix(X), 2, function(x) {
+      # myX <- matrix(x,ncol=length(unique(x)), nrow=length(x)) -
+      #   matrix(unique(x), ncol=length(unique(x)), nrow=length(x), byrow=TRUE)
+      myX <- matrix(x, ncol = length(x), nrow = length(x)) -
+        matrix(x,
+               ncol = length(x),
+               nrow = length(x),
+               byrow = TRUE)
+      myX <- ifelse(myX < 0, 0, 1)
+      myX
+    })
+
+    if (d >= 2) {
+      highDList <- plyr::alply(matrix(2:d), 1, function(k) {
+        thisList <- plyr::alply(combn(d, k), 2, function(x) {
+          Reduce("*", uniList[x])
+        })
+        Reduce("cbind", thisList)
+      })
+      initX <-
+        cbind(Reduce("cbind", uniList), Reduce("cbind", highDList))
+      dup <- duplicated(t(initX))
+      designX <- initX[, !dup]
+    } else {
+      initX <- Reduce("cbind", uniList)
+      dup <- duplicated(t(initX))
+      designX <- initX[, !dup]
+    }
+
+    fitCV <- glmnet::cv.glmnet(x = designX,
+                               y = Y,
+                               weights = obsWeights,
+                               lambda.min.ratio = 0.001,
+                               lambda = NULL,
+                               type.measure = "deviance",
+                               nfolds = nfolds,
+                               family = family$family,
+                               alpha = 1,
+                               nlambda = nlambda
+                              )
+
+    fit <- list(object = fitCV,
+                useMin = useMin,
+                X = X,
+                dup = dup,
+                sparseMat = sparseMat
+    )
+
+    ## get predictions back
+    if (!is.null(newX)) {
+      mynewX <-
+        matrix(newX[, 1], ncol = length(X[, 1]), nrow = length(newX[, 1])) -
+        matrix(X[, 1],
+               ncol = length(X[, 1]),
+               nrow = length(newX[, 1]),
+               byrow = TRUE)
+      mynewX <- ifelse(mynewX < 0, 0, 1)
+
+      makeNewDesignX <- TRUE
+      if (all(dim(X) == dim(newX)))
+        makeNewDesignX <- !all(X == newX)
+
+      if (makeNewDesignX) {
+        uniList <- plyr::alply(matrix(1:ncol(X)), 1, function(x) {
+          myX <- matrix(newX[, x], ncol = length(X[, x]), nrow = length(newX[, x])) -
+            matrix(
+              X[, x],
+              ncol = length(X[, x]),
+              nrow = length(newX[, x]),
+              byrow = TRUE
+            )
+          myX <- ifelse(myX < 0, 0, 1)
+          myX
+        })
+
+        if (d >= 2) {
+          highDList <- plyr::alply(matrix(2:d), 1, function(k) {
+            thisList <- plyr::alply(combn(d, k), 2, function(x) {
+              Reduce("*", uniList[x])
+            })
+            Reduce("cbind", thisList)
+          })
+
+          initX <-
+            cbind(Reduce("cbind", uniList), Reduce("cbind", highDList))
+          designNewX <- initX[, !dup]
+        } else {
+          initX <- Reduce("cbind", uniList)
+          designNewX <- initX[, !dup]
+        }
+      } else {
+        designNewX <- designX
+      }
+
+      pred <- predict(
+        fitCV$glmnet.fit,
+        newx = designNewX,
+        s = ifelse(useMin, fitCV$lambda.min, fitCV$lambda.1se),
+        type = "response"
+      )
+    }
+
+  } else {
+
+    # Using a Sparse Matrix.
+
+    if (is.vector(X))
+      X <- matrix(X, ncol = 1)
+
+    if (is.vector(newX))
+      newX <- matrix(newX, ncol = 1)
+
+    n <- length(X[, 1])
+    d <- ncol(X)
+
+    if (verbose) cat("Making sparse matrix \n")
+
+    time_sparse_start = proc.time()
+
+    X.init <- makeSparseMat(X = X, newX = X, verbose = verbose)
+
+    time_sparse_end = proc.time()
+    time_sparse_matrix = time_sparse_end - time_sparse_start
+
+    # Run garbage collection if we are in debug mode.
+    if (debug) gc()
+
+    ## find duplicated columns
+    if (verbose) cat("Finding duplicate columns \n")
+
+    # Number of columns will become the new number of observations in the data.table
+    nIndCols <- ncol(X.init)
+    # Pre-allocate a data.table with one column, each row will store a single column from X.init
+    datDT <-
+      data.table::data.table(ID = 1:nIndCols, bit_to_int_to_str = rep.int("0", nIndCols))
+    # Each column in X.init will be represented by a unique vector of integers.
+    # Each indicator column in X.init will be converted to a row of integers or a string of cat'ed integers in data.table
+    # The number of integers needed to represent a single column is determined automatically by package "bit" and it depends on nrow(X.init)
+    nbits <- nrow(X.init) # number of bits (0/1) used by each column in X.init
+    
+    bitvals <- bit::bit(length = nbits) # initial allocation (all 0/FALSE)
+    
+    nints_used <- length(unclass(bitvals)) # number of integers needed to represent each column
+
+    
+    # Track which results gave NA in one of the integers
+    ID_withNA <- NULL
+
+    # For loop over columns of X.init
+    for (i in 1:nIndCols) {
+      bitvals <- bit::bit(length = nbits) # initial allocation (all 0/FALSE)
+      Fidx_base0 <-
+        (X.init@p[i]):(X.init@p[i + 1] - 1) # zero-base indices of indices of non-zero rows for column i=1
+      nonzero_rows <-
+        X.init@i[Fidx_base0 + 1] + 1 # actual row numbers of non-zero elements in column i=1
+      # print(i); print(nonzero_rows)
+      # X.init@i[i:X.init@p[i]]+1 # row numbers of non-zero elements in first col
+      bitvals[nonzero_rows] <- TRUE
+      # str(bitwhich(bitvals))
+      intval <-
+        unclass(bitvals) # integer representation of the bit vector
+      # stringval <- stringr::str_c(intval, collapse = "")
+      if (any(is.na(intval)))
+        ID_withNA <- c(ID_withNA, i)
+      data.table::set(datDT, i, 2L, value = stringr::str_c(stringr::str_replace_na(intval), collapse = ""))
+    }
+    # create a hash-key on the string representation of the column,
+    # sorts it by bit_to_int_to_str using radix sort:
+    data.table::setkey(datDT, bit_to_int_to_str)
+    # add logical column indicating duplicates,
+    # following the first non-duplicate element
+    datDT[, duplicates := duplicated(datDT)]
+    # just get the column IDs and duplicate indicators:
+    datDT[, .(ID, duplicates)]
+
+    dupInds <- datDT[, ID][which(datDT[, duplicates])]
+
+    # ----------------------------------------------------------------------
+    # OS: NEW FASTER APPROACH TO FIND DUPLICATE IDs
+    # ----------------------------------------------------------------------
+    # get the number of duplicates in each group if its 1 the column is unique and we are note interested:
+    datDT[, Ngrp := .N, by = bit_to_int_to_str]
+    # collapse each duplicate group into a list of IDs, do that only among strings that have duplicates
+    collapsedDT <- datDT[Ngrp > 1, list(list(ID)), by = bit_to_int_to_str]
+    colDups <- collapsedDT[["V1"]]
+    # colDups[[2]]
+
+    ## ----------------------------------------------------------------------
+    ## OS: OLD APPROACH TO BE REMOVED AFTER VALIDATED
+    ## ----------------------------------------------------------------------
+    # uniqDup <- unique(datDT[duplicates == TRUE, bit_to_int_to_str])
+    # colDups.old <- alply(uniqDup, 1, function(l) {
+    #   datDT[, ID][which(datDT[, bit_to_int_to_str] == l)]
+    # })
+    ## ----------------------------------------------------------------------
+
+    time_dup_end = proc.time()
+
+    time_find_duplicates = time_dup_end - time_sparse_end
+
+    # Run garbage collection if we are in debug mode.
+    if (debug) gc()
+
+    if (verbose) cat("Fitting lasso \n")
+    if (length(dupInds) > 0) {
+      notDupInds <- (1:ncol(X.init))[-unlist(colDups, use.names = FALSE)]
+      keepDupInds <-
+        unlist(lapply(colDups, function(x) {
+          x[[1]]
+        }), use.names = FALSE)
+
+      fitCV <-
+        glmnet::cv.glmnet(
+          x = X.init[, c(keepDupInds, notDupInds)],
+          y = Y,
+          weights = obsWeights,
+          lambda = NULL,
+          lambda.min.ratio = 0.001,
+          type.measure = "deviance",
+          nfolds = nfolds,
+          family = family$family,
+          alpha = 1,
+          nlambda = nlambda,
+          parallel = parallel
+        )
+    } else {
+      # No duplication.
+      fitCV <- glmnet::cv.glmnet(
+        x = X.init,
+        y = Y,
+        weights = obsWeights,
+        lambda = NULL,
+        lambda.min.ratio = 0.001,
+        type.measure = "deviance",
+        nfolds = nfolds,
+        family = family$family,
+        alpha = 1,
+        nlambda = nlambda,
+        parallel = parallel
+      )
+    }
+
+    time_lasso_end = proc.time()
+
+    time_lasso = time_lasso_end - time_dup_end
+
+    fit <- list(object = fitCV,
+                useMin = useMin,
+                X = X,
+                dupInds = dupInds,
+                colDups = colDups,
+                sparseMat = sparseMat
+    )
+    class(fit) <- "hal"
+
+    if (identical(X, newX)) {
+      if (length(dupInds) > 0) {
+        pred <-
+          predict(
+            fitCV,
+            newx = X.init[, c(keepDupInds, notDupInds)],
+            s = ifelse(useMin, fitCV$lambda.min, fitCV$lambda.1se),
+            type = "response"
+          )
+      } else{
+        pred <-
+          predict(
+            fitCV,
+            newx = X.init,
+            s = ifelse(useMin, fitCV$lambda.min, fitCV$lambda.1se),
+            type = "response"
+          )
+      }
+    } else if (!is.null(newX)) {
+      pred <- predict(fit,
+                      newdata = newX,
+                      bigDesign = FALSE,
+                      chunks = 10000)
+    }
+
+    time_pred_end = proc.time()
+
+    time_pred = time_pred_end - time_lasso_end
+
+    time_everything = time_pred_end - time_sparse_start
+
+    times = list(sparse_matrix = time_sparse_matrix,
+              find_duplicates = time_find_duplicates,
+              lasso = time_lasso,
+              pred = time_pred,
+              everything = time_everything)
+
+    # Convert from a list to a nice matrix.
+    times = t(simplify2array(times))
+
+    # Done with sparse Matrix implementation.
+  }
+
+  # Run garbage collection if we are in debug mode.
+  if (debug) gc()
+
+  out <- list(pred = pred, fit = fit, times = times)
+  if (verbose) cat("Done with hal()\n")
+  return(out)
+}
