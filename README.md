@@ -1,4 +1,4 @@
-r2weight
+hal
 ================
 David Benkeser, Chris Kennedy, Oleg Sofrygin
 
