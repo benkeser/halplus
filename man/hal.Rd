@@ -2,44 +2,44 @@
 % Please edit documentation in R/hal.R
 \name{hal}
 \alias{hal}
-\title{Highly Adaptive Lasso}
+\title{hal}
 \usage{
-hal(Y, X, newX = NULL, family = gaussian(), verbose = F,
-  obsWeights = rep(1, length(Y)), sparseMat = TRUE,
+hal(Y, X, newX = NULL, verbose = FALSE, obsWeights = rep(1, length(Y)),
   nfolds = ifelse(length(Y) <= 100, 20, 10), nlambda = 100, useMin = TRUE,
-  debug = T, parallel = F, ...)
+  debug = TRUE, parallel = FALSE, ...)
 }
 \arguments{
-\item{Y}{outcome}
+\item{Y}{A \code{numeric} of outcomes}
 
-\item{X}{data}
+\item{X}{A \code{data.frame} of predictors}
 
-\item{newX}{New data to apply the model fit and generate predictions.}
+\item{newX}{Optional \code{data.frame} on which to return predicted values}
 
-\item{family}{Statistical family; gaussian() and binomial() have been tested.}
+\item{verbose}{A \code{boolean} indicating whether to print output on functions progress}
 
-\item{verbose}{Set to T for more detailed output}
+\item{obsWeights}{Optional \code{vector} of observation weights to be passed to \code{cv.glmnet}}
 
-\item{obsWeights}{observation weights}
+\item{nfolds}{Number of CV folds passed to \code{cv.glmnet}}
 
-\item{sparseMat}{Use sparse matrix implementation or normal matrix
-implementation. Normal matrix implementation is old and not guaranteed to
-work correctly.}
+\item{nlambda}{Number of lambda values to search across in \code{cv.glmnet}}
 
-\item{nfolds}{Number of CV folds for cv.glmnet}
+\item{useMin}{Option passed to \code{cv.glmnet}, use minimum risk lambda or 1se lambda (more
+penalization)}
 
-\item{nlambda}{Number of lambda values to test in cv.glmnet.}
+\item{debug}{For benchmarking. Setting to \code{TRUE} will run garbage collection to 
+improve the accuracy of memory monitoring}
 
-\item{useMin}{Glmnet option - use minimum risk lambda or 1se lambda (more
-penalization).}
-
-\item{debug}{Setting to T will run garbage collection to improve the accuracy
-of memory monitoring.}
-
-\item{parallel}{Use a registered parallel backend if possible.}
-
-\item{...}{Any extra arguments (unused).}
+\item{parallel}{A boolean indicating whether to use a parallel backend, if possible}
 }
 \description{
-Model fitting function.
+The highly adaptive lasso fitting function. This function takes a matrix of predictor values
+(which can be binary or continuous) and converts it into a set of indicator basis functions
+that perfectly fit the data. The function then uses cross-validated lasso (via the \code{glmnet} 
+package) to select basis functions. The resulting fit is called the highly adaptive lasso. 
+The process of creating the indicator basis functions can be extremely time and memory intensive 
+as it involves creating n(2^d - 1) basis functions, where n is the number of observations 
+and d the number of covariates. The function also must subsequently search over basis functions
+for those that are duplicated and store the results. Future implementations will attempt to 
+streamline this process to the largest extent possible; however, for the time being implementing
+with values of n and d such that n(2^d - 1) > 1e7 is not recommended.
 }

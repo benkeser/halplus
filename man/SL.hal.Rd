@@ -5,34 +5,29 @@
 \title{Highly Adaptive Lasso}
 \usage{
 SL.hal(Y, X, newX, family = gaussian(), verbose = TRUE,
-  obsWeights = rep(1, length(Y)), sparseMat = TRUE,
-  nfolds = ifelse(length(Y) <= 100, 20, 10), nlambda = 100, useMin = TRUE,
-  ...)
+  obsWeights = rep(1, length(Y)), nfolds = ifelse(length(Y) <= 100, 20, 10),
+  nlambda = 100, useMin = TRUE, ...)
 }
 \arguments{
-\item{Y}{outcome}
+\item{Y}{A \code{numeric} of outcomes}
 
-\item{X}{data}
+\item{X}{A \code{data.frame} of predictors}
 
-\item{newX}{New data to apply the model fit and generate predictions.}
+\item{newX}{Optional \code{data.frame} on which to return predicted values}
 
-\item{family}{Statistical family}
+\item{verbose}{A \code{boolean} indicating whether to print output on functions progress}
 
-\item{verbose}{Set to T for more detailed output}
+\item{obsWeights}{Optional \code{vector} of observation weights to be passed to \code{cv.glmnet}}
 
-\item{obsWeights}{observation weights}
+\item{nfolds}{Number of CV folds passed to \code{cv.glmnet}}
 
-\item{sparseMat}{Use sparse matrix implementation or normal matrix implementation.}
+\item{nlambda}{Number of lambda values to search across in \code{cv.glmnet}}
 
-\item{nfolds}{Number of CV folds for cv.glmnet}
-
-\item{nlambda}{Number of lambda values to test in cv.glmnet.}
-
-\item{useMin}{Glmnet option - use minimum risk lambda or 1se lambda (more
-penalization).}
+\item{useMin}{Option passed to \code{cv.glmnet}, use minimum risk lambda or 1se lambda (more
+penalization)}
 
 \item{...}{Any other arguments to pass-through to hal()}
 }
 \description{
-SuperLearner wrapper
+SuperLearner wrapper for \code{hal}.
 }

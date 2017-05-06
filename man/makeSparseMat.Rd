@@ -2,17 +2,18 @@
 % Please edit documentation in R/makeSparseMat.R
 \name{makeSparseMat}
 \alias{makeSparseMat}
-\title{Creates a sparseMatrix of the indicators}
+\title{makeSparseMat}
 \usage{
 makeSparseMat(X, newX = X, verbose = TRUE)
 }
 \arguments{
-\item{X}{X}
+\item{X}{A \code{data.frame} of predictors}
 
-\item{newX}{newX}
+\item{newX}{Optional \code{data.frame} on which to return predicted values}
 
-\item{verbose}{If true output extra info during execution.}
+\item{verbose}{A \code{boolean} indicating whether to print output on functions progress}
 }
 \description{
-Add more details.
+Function to create a sparse design matrix of basis functions
+based on a matrix of predictors.
 }
