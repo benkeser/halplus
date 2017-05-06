@@ -15,6 +15,8 @@ SL.hal(Y, X, newX, family = gaussian(), verbose = TRUE,
 
 \item{newX}{Optional \code{data.frame} on which to return predicted values}
 
+\item{family}{Needs to have a character object in \code{family$family} as required by \code{SuperLearner}}
+
 \item{verbose}{A \code{boolean} indicating whether to print output on functions progress}
 
 \item{obsWeights}{Optional \code{vector} of observation weights to be passed to \code{cv.glmnet}}

@@ -23,7 +23,7 @@
 #' @param debug For benchmarking. Setting to \code{TRUE} will run garbage collection to 
 #' improve the accuracy of memory monitoring
 #' @param parallel A boolean indicating whether to use a parallel backend, if possible
-#'
+#' @param ... Not currently used 
 #' @importFrom glmnet cv.glmnet
 #' @importFrom bit bit
 #' @importFrom stats gaussian predict
@@ -208,7 +208,8 @@ hal <- function(Y,
       parallel = parallel
     )
   }
-    
+  time_lasso_end <- proc.time()
+  time_lasso <- time_dup_end - time_lasso_end
   #------------------------------------------------------------  
   # Initial output object (pred and times added below)
   #------------------------------------------------------------

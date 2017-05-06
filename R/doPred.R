@@ -3,13 +3,10 @@
 #' A helper function for the predict method for class \code{hal}.
 #' @param object A fitted object of class \code{hal}
 #' @param newdata A matrix of new predictions to obtain predictions
-#' @param bigDesign A boolean indicating whether to obtain predictions all at once
-#' (which may be memory intractable) or to split up the task into smaller chunks
-#' @param chunks A numeric indicating how many chunks to split the prediction task into
-#' (if \code{bigDesign = FALSE})
 #' @param s Option from \code{glmnet} indicating what value to use. Defaults to the value
 #' that was specified in the original call to \code{hal} (which itself defaults to the value
 #' which minimizes MSE).
+#' @param verbose A \code{boolean} indicating whether to print output on functions progress
 #' @param ... Additional arguments (not currently used)
 #' 
 #' @importFrom Matrix sparseMatrix

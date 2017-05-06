@@ -11,6 +11,7 @@
 #' @param nlambda Number of lambda values to search across in \code{cv.glmnet}
 #' @param useMin Option passed to \code{cv.glmnet}, use minimum risk lambda or 1se lambda (more
 #'   penalization)
+#' @param family Needs to have a character object in \code{family$family} as required by \code{SuperLearner}
 #' @param ... Any other arguments to pass-through to hal()
 #'
 #' @export
@@ -42,14 +43,15 @@ SL.hal <- function(Y,
 #' @param newdata A matrix of new predictions to obtain predictions
 #' @param bigDesign A boolean indicating whether to obtain predictions all at once
 #' (which may be memory intractable) or to split up the task into smaller chunks
-#' @param chunks A numeric indicating how many chunks to split the prediction task into
+#' @param nChunks A numeric indicating how many chunks to split the prediction task into
 #' (if \code{bigDesign = FALSE})
+#' @param ... Other arguments passed to \code{predict}
 #' 
 #' @importFrom stats predict
 #' @export 
-predict.SL.hal <- function(object, newdata, bigDesign = FALSE, nChunks = 50, ...){
+predict.SL.hal <- function(object, newdata, bigDesign = FALSE, chunks = 5000, ...){
       pred <- stats::predict(object$object, newdata = newdata, bigDesign = bigDesign, 
-                      nChunks = nChunks)
+                      chunks = chunks,...)
       return(pred)
 }
 

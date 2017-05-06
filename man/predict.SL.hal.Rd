@@ -21,7 +21,9 @@
 \item{bigDesign}{A boolean indicating whether to obtain predictions all at once
 (which may be memory intractable) or to split up the task into smaller chunks}
 
-\item{chunks}{A numeric indicating how many chunks to split the prediction task into
+\item{...}{Other arguments passed to \code{predict}}
+
+\item{nChunks}{A numeric indicating how many chunks to split the prediction task into
 (if \code{bigDesign = FALSE})}
 }
 \description{

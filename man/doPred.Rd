@@ -11,15 +11,11 @@ doPred(object, newdata, verbose = FALSE, s)
 
 \item{newdata}{A matrix of new predictions to obtain predictions}
 
+\item{verbose}{A \code{boolean} indicating whether to print output on functions progress}
+
 \item{s}{Option from \code{glmnet} indicating what value to use. Defaults to the value
 that was specified in the original call to \code{hal} (which itself defaults to the value
 which minimizes MSE).}
-
-\item{bigDesign}{A boolean indicating whether to obtain predictions all at once
-(which may be memory intractable) or to split up the task into smaller chunks}
-
-\item{chunks}{A numeric indicating how many chunks to split the prediction task into
-(if \code{bigDesign = FALSE})}
 
 \item{...}{Additional arguments (not currently used)}
 }

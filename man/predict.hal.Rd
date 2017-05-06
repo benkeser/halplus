@@ -5,7 +5,7 @@
 \title{predict.hal}
 \usage{
 \method{predict}{hal}(object, newdata, bigDesign = FALSE, verbose = TRUE,
-  chunks = 1000, s = ifelse(object$useMin, object$object$lambda.min,
+  chunks = 5000, s = ifelse(object$useMin, object$object$lambda.min,
   object$object$lambda.1se), ...)
 }
 \arguments{
@@ -15,6 +15,8 @@
 
 \item{bigDesign}{A boolean indicating whether to obtain predictions all at once
 (which may be memory intractable) or to split up the task into smaller chunks}
+
+\item{verbose}{A \code{boolean} indicating whether to print output on functions progress}
 
 \item{chunks}{A numeric indicating how many chunks to split the prediction task into
 (if \code{bigDesign = FALSE})}

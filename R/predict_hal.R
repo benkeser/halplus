@@ -11,6 +11,8 @@
 #' @param s Option from \code{glmnet} indicating what value to use. Defaults to the value
 #' that was specified in the original call to \code{hal} (which itself defaults to the value
 #' which minimizes MSE).
+#' @param verbose A \code{boolean} indicating whether to print output on functions progress
+
 #' @param ... Additional arguments (not currently used)
 #' 
 #' @export
@@ -19,7 +21,7 @@ predict.hal <-
            newdata,
            bigDesign = FALSE,
            verbose = TRUE,
-           chunks = 1000,
+           chunks = 5000,
            s = ifelse(object$useMin, object$object$lambda.min, object$object$lambda.1se),
            ...)
   {

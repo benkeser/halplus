@@ -30,6 +30,8 @@ penalization)}
 improve the accuracy of memory monitoring}
 
 \item{parallel}{A boolean indicating whether to use a parallel backend, if possible}
+
+\item{...}{Not currently used}
 }
 \description{
 The highly adaptive lasso fitting function. This function takes a matrix of predictor values
