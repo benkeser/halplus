@@ -13,7 +13,6 @@ Imports:
     data.table,
     glmnet,
     Matrix,
-    np,
     plyr,
     stringr
 Suggests:

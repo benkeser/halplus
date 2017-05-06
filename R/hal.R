@@ -208,39 +208,7 @@ hal <- function(Y,
       parallel = parallel
     )
   }
-    class(fit) <- "hal"
-
-    if (identical(X, newX)) {
-      if (length(dupInds) > 0) {
-        pred <-
-          predict(
-            fitCV,
-            newx = X.init[, c(keepDupInds, notDupInds)],
-            s = ifelse(useMin, fitCV$lambda.min, fitCV$lambda.1se),
-            type = "response"
-          )
-      } else{
-        pred <-
-          predict(
-            fitCV,
-            newx = X.init,
-            s = ifelse(useMin, fitCV$lambda.min, fitCV$lambda.1se),
-            type = "response"
-          )
-      }
-    } else if (!is.null(newX)) {
-      pred <- predict(fit,
-                      newdata = newX,
-                      bigDesign = FALSE,
-                      chunks = 10000)
-    }
-
-  time_pred_end <- proc.time()
-  time_pred <- time_pred_end - time_lasso_end
-  time_lasso_end <- proc.time()
-
-  time_lasso <- time_lasso_end - time_dup_end
-
+    
   #------------------------------------------------------------  
   # Initial output object (pred and times added below)
   #------------------------------------------------------------
