@@ -43,8 +43,8 @@ SL.hal <- function(Y,
 #' @param newdata A matrix of new predictions to obtain predictions
 #' @param bigDesign A boolean indicating whether to obtain predictions all at once
 #' (which may be memory intractable) or to split up the task into smaller chunks
-#' @param nChunks A numeric indicating how many chunks to split the prediction task into
-#' (if \code{bigDesign = FALSE})
+#' @param chunks A numeric indicating how many observations to use in each chunk of
+#' the prediction task (if \code{bigDesign = FALSE})
 #' @param ... Other arguments passed to \code{predict}
 #' 
 #' @importFrom stats predict

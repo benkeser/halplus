@@ -8,6 +8,7 @@
 #' @param verbose A \code{boolean} indicating whether to print output on functions progress
 
 #' @importFrom plyr llply alply
+#' @export
 # TODO: don't always have a newX.
 
 makeSparseMat <- function(X, newX = X, verbose = TRUE) {
