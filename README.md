@@ -2,8 +2,8 @@ hal
 ================
 David Benkeser, Chris Kennedy, Oleg Sofrygin
 
-[![Travis-CI Build Status](https://travis-ci.org/benkeser/halplus.svg?branch=master)](https://travis-ci.org/benkeser/drtml)
-[![AppVeyor Build  Status](https://ci.appveyor.com/api/projects/status/github/benkeser/halplus?branch=master&svg=true)](https://ci.appveyor.com/project/benkeser/survtmle)
+[![Travis-CI Build Status](https://travis-ci.org/benkeser/halplus.svg?branch=master)](https://travis-ci.org/benkeser/halplus)
+[![AppVeyor Build  Status](https://ci.appveyor.com/api/projects/status/github/benkeser/halplus?branch=master&svg=true)](https://ci.appveyor.com/project/benkeser/halplus)
 [![CRAN](http://www.r-pkg.org/badges/version/halplus)](http://www.r-pkg.org/pkg/halplus)
 [![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
