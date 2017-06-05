@@ -1,5 +1,4 @@
 # R/`hal`
-David Benkeser, Chris Kennedy, Oleg Sofrygin, Nima Hejazi
 
 [![Travis-CI Build Status](https://travis-ci.org/benkeser/halplus.svg?branch=master)](https://travis-ci.org/benkeser/halplus)
 [![AppVeyor Build  Status](https://ci.appveyor.com/api/projects/status/github/benkeser/halplus?branch=master&svg=true)](https://ci.appveyor.com/project/benkeser/halplus)
@@ -8,6 +7,8 @@ David Benkeser, Chris Kennedy, Oleg Sofrygin, Nima Hejazi
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
 > The highly adaptive LASSO estimator
+
+David Benkeser, Chris Kennedy, Oleg Sofrygin, Nima Hejazi
 
 ---
 
@@ -19,12 +20,17 @@ David Benkeser, Chris Kennedy, Oleg Sofrygin, Nima Hejazi
 
 ## Installation
 
-Install from GitHub using `devtools`:
+<!---
+For standard use, install from [CRAN](https://cran.r-project.org/):
+  ```
+  install.packages("hal")
+  ```
+--->
 
-```{r}
-if (!require(devtools)) install.packages(devtools)
-devtools::install_github("benkeser/halplus")
-```
+Install the most recent _stable release_ from GitHub:
+  ```
+  devtools::install_github("benkeser/halplus")
+  ```
 
 ---
 
@@ -37,12 +43,12 @@ issue](https://github.com/benkeser/halplus/issues).
 
 ## References
 
-[Benkeser, D. and van der Laan, M.J. (2016). "The Highly Adaptive Lasso
+[Benkeser, D., and van der Laan, M.J. (2016). "The Highly Adaptive Lasso
 Estimator." Proceedings of the 2016 IEEE International Conference on Data
 Science and Advanced Analytics. 689-696. doi:
 10.1109/DSAA.2016.93.](http://ieeexplore.ieee.org/document/7796956/)
 
-[van der Laan, Mark J. (2015). "A Generally Efficient Targeted Minimum Loss
+[van der Laan, M.J. (2015). "A Generally Efficient Targeted Minimum Loss
 Based Estimator." U.C. Berkeley Division of Biostatistics Working Paper Series.
 Working Paper 343.](http://biostats.bepress.com/ucbbiostat/paper343)
 

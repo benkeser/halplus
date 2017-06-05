@@ -1,5 +1,5 @@
 Package: hal
-Title: Highly Adaptive Lasso
+Title: Highly Adaptive LASSO
 Version: 0.01
 Authors@R: as.person(c(
     "David Benkeser <benkeser@berkeley.edu> [aut, cre, cph]",
@@ -9,10 +9,13 @@ Authors@R: as.person(c(
     "Oleg Sofrygin <oleg.sofrygin@gmail.com> [ctb]",
     "Andre Kurepa Waschka <akwaschka@berkeley.edu> [ctb]"
     ))
-Description: Highly adaptive LASSO estimator.
+Description: The highly adaptive LASSO (HAL) estimator.
 Depends:
     R (>= 3.1.0)
 License: MIT + file LICENSE
+URL: https://github.com/benkeser/halplus
+BugReports: https://github.com/benkeser/halplus/issues
+Encoding: UTF-8
 LazyData: true
 Imports:
     bit,
@@ -34,4 +37,5 @@ Suggests:
     RCurl,
     SuperLearner,
     testthat
+VignetteBuilder: knitr
 RoxygenNote: 6.0.1
