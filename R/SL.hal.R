@@ -31,18 +31,11 @@ SL.hal <- function(Y,
                    ...) {
   result = hal(Y = Y, X = X, newX = newX, family = family, verbose = verbose,
       obsWeights = obsWeights, sparseMat = sparseMat, nfolds = nfolds,
-<<<<<<< HEAD
       nlambda = nlambda,  minVars = NULL, maxDim = 20, useMin = useMin, ...)
-  out <- list(hal)
-  class(out) <- "SL.hal"
-  return(out)
-=======
-      nlambda = nlambda, useMin = useMin, ...)
 
   # Overwrite the class returned by hal().
   # TODO: this needs to be revised once the hal() result is improved.
   class(result$fit) = "SL.hal"
 
   result
->>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
 }

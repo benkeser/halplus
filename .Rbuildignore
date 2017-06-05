@@ -3,9 +3,6 @@
 ^\.Rproj\.user$
 ^sandbox$
 ^docs$
-<<<<<<< HEAD
-=======
 ^appveyor\.yml$
 ^codecov\.yml$
 ^.travis\.yml$
->>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
