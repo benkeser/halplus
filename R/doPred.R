@@ -1,14 +1,33 @@
+#' doPred
+#'
+#' A helper function for the predict method for class \code{hal}.
+#' @param object A fitted object of class \code{hal}
+#' @param newdata A matrix of new predictions to obtain predictions
+#' @param s Option from \code{glmnet} indicating what value to use. Defaults to the value
+#' that was specified in the original call to \code{hal} (which itself defaults to the value
+#' which minimizes MSE).
+#' @param verbose A \code{boolean} indicating whether to print output on functions progress
+#' @param ... Additional arguments (not currently used)
+#'
 #' @importFrom Matrix sparseMatrix
-doPred <- function(object, newdata, verbose = TRUE, s) {
+
+doPred <- function(object, newdata, verbose = FALSE, s) {
   if (is.vector(newdata))
     newdata <- matrix(newdata)
 
   if (verbose)
     cat("Making initial sparse matrix for predictions \n")
+
+  #---------------------------------------------------
+  # Make an initial sparse matrix based on newdata
+  #---------------------------------------------------
   tmp <- makeSparseMat(X = object$X,
                        newX = newdata,
                        verbose = verbose)
 
+  #---------------------------------------------------
+  # Correct duplicate columns (if any)
+  #---------------------------------------------------
   if (length(object$dupInds) > 0) {
     if (verbose)
       cat("Correcting duplicate columns in sparse matrix \n")
@@ -28,7 +47,7 @@ doPred <- function(object, newdata, verbose = TRUE, s) {
 
     uniqRowsList <- list()
     myp <- c(0, rep(NA, K))
-    # look at the i associatiated with
+    # look at the i associated with
     for (k in 1:K) {
       # this condition ensures that not all the values of a given set of duplicates
       # are equal to zero.
@@ -50,7 +69,7 @@ doPred <- function(object, newdata, verbose = TRUE, s) {
 
     # look at this sparse matrix
     myi <- unlist(uniqRowsList)
-    # check if it came out right
+    # check to see if it came out right
     # grbg1 <- sparseMatrix(i=myi, p=myp, x=1)
 
     # fix up p with nondup columns
@@ -66,7 +85,7 @@ doPred <- function(object, newdata, verbose = TRUE, s) {
       fulli <- myi
       fullp <- myp
     }
-    #
+    # sparseMatrix with duplicate columns removed
     tmp <- Matrix::sparseMatrix(
       i = fulli,
       p = fullp,
@@ -77,7 +96,10 @@ doPred <- function(object, newdata, verbose = TRUE, s) {
       )
     )
   }
-  pred <- predict(object$object$glmnet.fit, newx = tmp,
+
+  # call predict.glmnet to get predictions on new sparseMat with duplicate
+  # columns removed.
+  pred <- stats::predict(object$object$glmnet.fit, newx = tmp,
                   s = s)
-  pred
+  return(pred)
 }

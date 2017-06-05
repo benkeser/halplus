@@ -1,13 +1,16 @@
-#' Creates a sparseMatrix of the indicators
-#'
-#' Add more details.
-#'
-#' @param X X
-#' @param newX newX
-#' @param verbose If true output extra info during execution.
-#' @importFrom plyr llply
+#' makeSparseMat
+#' 
+#' Function to create a sparse design matrix of basis functions
+#' based on a matrix of predictors.
+#' 
+#' @param X A \code{data.frame} of predictors
+#' @param newX Optional \code{data.frame} on which to return predicted values
+#' @param verbose A \code{boolean} indicating whether to print output on functions progress
+
+#' @importFrom plyr llply alply
 #' @export
-# TODO: don't always have a newX? What is the difference between X and newX?
+# TODO: don't always have a newX.
+
 makeSparseMat <- function(X, newX = X, verbose = TRUE) {
 
   if (is.vector(X)) X <- matrix(X, ncol = 1)
@@ -56,37 +59,6 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
   i <- uni.ij[, 1]
   j <- uni.ij[, 2]
 
-  # functions used for higher order terms
-  .myIntersect <- function(...) {
-    Reduce(intersect, list(...))
-  }
-
-  # This is the major user of execution time and memory.
-  # What does this do??
-  .getIntersect <- function(...) {
-    tmp <- lapply(..., function(b) {
-      split(b[, 2], b[, 1])
-    })
-    tmpNames <- lapply(tmp, function(l) {
-      as.numeric(names(l))
-    })
-    overlap <- Reduce(intersect, tmpNames)
-
-    # indices of tmp that overlap
-    newtmp <- lapply(tmp, function(b) {
-      b[paste(overlap)]
-    })
-
-    # Get intersection
-    # CK: parse() and eval() are probably slowing this down.
-    out <- eval(parse(text = paste0(
-      paste0("mapply(.myIntersect,"),
-      paste0("newtmp[[", 1:length(tmp), "]]", collapse = ","),
-      ",SIMPLIFY=FALSE)"
-    )))
-    out
-  }
-
   # Loop over higher order terms.
   if (d > 1) {
     for (k in 2:d) {
@@ -100,8 +72,6 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
       colStart <- colEnd + 1L
       colEnd <- (colStart - 1L) + ncol(combos)
 
-      # list of length d choose k, each entry
-      # containing n indices of columns corresponding to subjects
       # This is the primary cause of execution time and memory usage.
       j.list <- plyr::alply(combos, 2L, function(a) {
         .getIntersect(uni[a])
@@ -131,6 +101,8 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
       # Put it together
       # CK: this is dynamic memory allocation - pre-allocating would be much better if possible.
       # Can we determine what the size will be in advance, or no?
+      # DB: I need to think on this some more. The code above is a hot mess and I should've 
+      # documented better. Is the dynamic memory allocation hurting?
       i <- c(i, thisi)
       j <- c(j, thisj)
     }
@@ -145,4 +117,43 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
       dims = c(n, nX * (2 ^ d - 1))
     )
   return(grbg)
+}
+
+
+#' myIntersect
+#' 
+#' Helper function for higher order interaction basis functions.
+#' 
+#' @param ... Arguments passed to intersect
+#' 
+.myIntersect <- function(...) {
+  Reduce(intersect, list(...))
+}
+
+#' getIntersect 
+#' 
+#' Heper function for higher order interaction basis functions.
+#' 
+#' @param ... Arguments passed to \code{lapply}
+.getIntersect <- function(...) {
+  tmp <- lapply(..., function(b) {
+    split(b[, 2], b[, 1])
+  })
+  tmpNames <- lapply(tmp, function(l) {
+    as.numeric(names(l))
+  })
+  overlap <- Reduce(intersect, tmpNames)
+
+  # indices of tmp that overlap
+  newtmp <- lapply(tmp, function(b) {
+    b[paste(overlap)]
+  })
+
+  # get intersection
+  out <- eval(parse(text = paste0(
+    paste0("mapply(.myIntersect,"),
+    paste0("newtmp[[", 1:length(tmp), "]]", collapse = ","),
+    ",SIMPLIFY=FALSE)"
+  )))
+  out
 }
