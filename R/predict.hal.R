@@ -1,7 +1,8 @@
-#' Quick pass-through.
+#' @importFrom plyr alply
+#' @importFrom stats predict
 #' @export
-<<<<<<< HEAD
-predict.SL.hal <- function(object,
+predict.hal <-
+  function(object,
            newdata,
            bigDesign = FALSE,
            verbose = TRUE,
@@ -120,15 +121,4 @@ predict.SL.hal <- function(object,
       }
     }
     return(as.numeric(pred))
-  }
-=======
-predict.SL.hal = function(object,
-                          newdata,
-                          bigDesign = FALSE,
-                          verbose = TRUE,
-                          chunks = 1000,
-                          s = ifelse(object$useMin, object$object$lambda.min, object$object$lambda.1se),
-                          ...) {
-  pred <- predict(object, newdata, bigDesign, verbose, chunks, s, ...)
 }
->>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6

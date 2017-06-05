@@ -5,6 +5,7 @@
 #' @param Y outcome
 #' @param X data
 #' @param newX New data to apply the model fit and generate predictions.
+<<<<<<< HEAD
 #' @param family Statistical family: Gaussian and Binomial have been tested.
 #' @param verbose Set to \code{TRUE} for more detailed output.
 #' @param obsWeights Weights to be given to observations.
@@ -28,6 +29,20 @@
 #'   the minimum (consult help for \code{glmnet::cv.glmnet} for more info).
 #' @param debug Set to \code{TRUE} to run garbage collection (\code{gc}), to
 #'   improve the accuracy of memory monitoring.
+=======
+#' @param family Statistical family; gaussian() and binomial() have been tested.
+#' @param verbose Set to T for more detailed output
+#' @param obsWeights observation weights
+#' @param sparseMat Use sparse matrix implementation or normal matrix
+#'   implementation. Normal matrix implementation is old and not guaranteed to
+#'   work correctly.
+#' @param nfolds Number of CV folds for cv.glmnet
+#' @param nlambda Number of lambda values to test in cv.glmnet.
+#' @param useMin Glmnet option - use minimum risk lambda or 1se lambda (more
+#'   penalization).
+#' @param debug Setting to T will run garbage collection to improve the accuracy
+#'  of memory monitoring.
+>>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
 #' @param parallel Use a registered parallel backend if possible.
 #' @param ... Any extra arguments (unused).
 #'
@@ -56,18 +71,23 @@ hal <- function(Y,
                 debug = TRUE,
                 parallel = FALSE,
                 ... # allow extra arguments with no death
-                ) {
-
+) {
+  
   d <- ncol(X)
+<<<<<<< HEAD
   alpha <- 0.05
 
+=======
+  
+>>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
   # Run garbage collection if we are in debug mode.
   if (debug) gc()
-
+  
   # Initialize prediction object to null in case newX = NULL.
   pred = NULL
   times = NULL
   
+<<<<<<< HEAD
   # set minimum number of variables automatically if dimension is too high
   if(is.null(minVars) & (d > maxDim)) {
     minVars <- maxDim # what's a good cutoff?
@@ -93,6 +113,8 @@ hal <- function(Y,
     X <- X[, keep]
   }
 
+=======
+>>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
   if (!sparseMat) {
     uniList <- plyr::alply(as.matrix(X), 2, function(x) {
       # myX <- matrix(x,ncol=length(unique(x)), nrow=length(x)) -
@@ -105,7 +127,7 @@ hal <- function(Y,
       myX <- ifelse(myX < 0, 0, 1)
       myX
     })
-
+    
     if (d >= 2) {
       highDList <- plyr::alply(matrix(2:d), 1, function(k) {
         thisList <- plyr::alply(combn(d, k), 2, function(x) {
@@ -122,6 +144,7 @@ hal <- function(Y,
       dup <- duplicated(t(initX))
       designX <- initX[, !dup]
     }
+<<<<<<< HEAD
 
     fitCV <- glmnet::cv.glmnet(x = designX,
                                y = Y,
@@ -135,13 +158,30 @@ hal <- function(Y,
                                nlambda = nlambda
                               )
 
+=======
+    
+    fitCV <-
+      glmnet::cv.glmnet(
+        x = designX,
+        y = Y,
+        weights = obsWeights,
+        lambda.min.ratio = 0.001,
+        lambda = NULL,
+        type.measure = "deviance",
+        nfolds = nfolds,
+        family = family$family,
+        alpha = 1,
+        nlambda = nlambda
+      )
+    
+>>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
     fit <- list(object = fitCV,
                 useMin = useMin,
                 X = X,
                 dup = dup,
                 sparseMat = sparseMat
     )
-
+    
     ## get predictions back
     if (!is.null(newX)) {
       mynewX <-
@@ -151,11 +191,11 @@ hal <- function(Y,
                nrow = length(newX[, 1]),
                byrow = TRUE)
       mynewX <- ifelse(mynewX < 0, 0, 1)
-
+      
       makeNewDesignX <- TRUE
       if (all(dim(X) == dim(newX)))
         makeNewDesignX <- !all(X == newX)
-
+      
       if (makeNewDesignX) {
         uniList <- plyr::alply(matrix(1:ncol(X)), 1, function(x) {
           myX <- matrix(newX[, x], ncol = length(X[, x]), nrow = length(newX[, x])) -
@@ -168,7 +208,7 @@ hal <- function(Y,
           myX <- ifelse(myX < 0, 0, 1)
           myX
         })
-
+        
         if (d >= 2) {
           highDList <- plyr::alply(matrix(2:d), 1, function(k) {
             thisList <- plyr::alply(combn(d, k), 2, function(x) {
@@ -176,7 +216,7 @@ hal <- function(Y,
             })
             Reduce("cbind", thisList)
           })
-
+          
           initX <-
             cbind(Reduce("cbind", uniList), Reduce("cbind", highDList))
           designNewX <- initX[, !dup]
@@ -187,7 +227,7 @@ hal <- function(Y,
       } else {
         designNewX <- designX
       }
-
+      
       pred <- predict(
         fitCV$glmnet.fit,
         newx = designNewX,
@@ -195,35 +235,35 @@ hal <- function(Y,
         type = "response"
       )
     }
-
+    
   } else {
-
+    
     # Using a Sparse Matrix.
-
+    
     if (is.vector(X))
       X <- matrix(X, ncol = 1)
-
+    
     if (is.vector(newX))
       newX <- matrix(newX, ncol = 1)
-
+    
     n <- length(X[, 1])
     d <- ncol(X)
-
+    
     if (verbose) cat("Making sparse matrix \n")
-
+    
     time_sparse_start = proc.time()
-
+    
     X.init <- makeSparseMat(X = X, newX = X, verbose = verbose)
-
+    
     time_sparse_end = proc.time()
     time_sparse_matrix = time_sparse_end - time_sparse_start
-
+    
     # Run garbage collection if we are in debug mode.
     if (debug) gc()
-
+    
     ## find duplicated columns
     if (verbose) cat("Finding duplicate columns \n")
-
+    
     # Number of columns will become the new number of observations in the data.table
     nIndCols <- ncol(X.init)
     # Pre-allocate a data.table with one column, each row will store a single column from X.init
@@ -232,16 +272,25 @@ hal <- function(Y,
     # Each column in X.init will be represented by a unique vector of integers.
     # Each indicator column in X.init will be converted to a row of integers or a string of cat'ed integers in data.table
     # The number of integers needed to represent a single column is determined automatically by package "bit" and it depends on nrow(X.init)
+<<<<<<< HEAD
     nbits <- nrow(X.init) # number of bits (0/1) used by each column in X.init
     
     bitvals <- bit::bit(length = nbits) # initial allocation (all 0/FALSE)
     
     nints_used <- length(unclass(bitvals)) # number of integers needed to represent each column
 
+=======
+    nbits <-
+      nrow(X.init) # number of bits (0/1) used by each column in X.init
+    bitvals <-
+      bit(length = nbits) # initial allocation (all 0/FALSE)
+    nints_used <-
+      length(unclass(bitvals)) # number of integers needed to represent each column
+>>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
     
     # Track which results gave NA in one of the integers
     ID_withNA <- NULL
-
+    
     # For loop over columns of X.init
     for (i in 1:nIndCols) {
       bitvals <- bit::bit(length = nbits) # initial allocation (all 0/FALSE)
@@ -268,9 +317,9 @@ hal <- function(Y,
     datDT[, duplicates := duplicated(datDT)]
     # just get the column IDs and duplicate indicators:
     datDT[, .(ID, duplicates)]
-
+    
     dupInds <- datDT[, ID][which(datDT[, duplicates])]
-
+    
     # ----------------------------------------------------------------------
     # OS: NEW FASTER APPROACH TO FIND DUPLICATE IDs
     # ----------------------------------------------------------------------
@@ -280,7 +329,7 @@ hal <- function(Y,
     collapsedDT <- datDT[Ngrp > 1, list(list(ID)), by = bit_to_int_to_str]
     colDups <- collapsedDT[["V1"]]
     # colDups[[2]]
-
+    
     ## ----------------------------------------------------------------------
     ## OS: OLD APPROACH TO BE REMOVED AFTER VALIDATED
     ## ----------------------------------------------------------------------
@@ -289,14 +338,14 @@ hal <- function(Y,
     #   datDT[, ID][which(datDT[, bit_to_int_to_str] == l)]
     # })
     ## ----------------------------------------------------------------------
-
+    
     time_dup_end = proc.time()
-
+    
     time_find_duplicates = time_dup_end - time_sparse_end
-
+    
     # Run garbage collection if we are in debug mode.
     if (debug) gc()
-
+    
     if (verbose) cat("Fitting lasso \n")
     if (length(dupInds) > 0) {
       notDupInds <- (1:ncol(X.init))[-unlist(colDups, use.names = FALSE)]
@@ -304,7 +353,7 @@ hal <- function(Y,
         unlist(lapply(colDups, function(x) {
           x[[1]]
         }), use.names = FALSE)
-
+      
       fitCV <-
         glmnet::cv.glmnet(
           x = X.init[, c(keepDupInds, notDupInds)],
@@ -335,11 +384,11 @@ hal <- function(Y,
         parallel = parallel
       )
     }
-
+    
     time_lasso_end = proc.time()
-
+    
     time_lasso = time_lasso_end - time_dup_end
-
+    
     fit <- list(object = fitCV,
                 useMin = useMin,
                 X = X,
@@ -348,7 +397,11 @@ hal <- function(Y,
                 sparseMat = sparseMat
     )
     class(fit) <- "hal"
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
     if (identical(X, newX)) {
       if (length(dupInds) > 0) {
         pred <-
@@ -373,28 +426,28 @@ hal <- function(Y,
                       bigDesign = FALSE,
                       chunks = 10000)
     }
-
+    
     time_pred_end = proc.time()
-
+    
     time_pred = time_pred_end - time_lasso_end
-
+    
     time_everything = time_pred_end - time_sparse_start
-
+    
     times = list(sparse_matrix = time_sparse_matrix,
-              find_duplicates = time_find_duplicates,
-              lasso = time_lasso,
-              pred = time_pred,
-              everything = time_everything)
-
+                 find_duplicates = time_find_duplicates,
+                 lasso = time_lasso,
+                 pred = time_pred,
+                 everything = time_everything)
+    
     # Convert from a list to a nice matrix.
     times = t(simplify2array(times))
-
+    
     # Done with sparse Matrix implementation.
   }
-
+  
   # Run garbage collection if we are in debug mode.
   if (debug) gc()
-
+  
   out <- list(pred = pred, fit = fit, times = times)
   if (verbose) cat("Done with hal()\n")
   return(out)

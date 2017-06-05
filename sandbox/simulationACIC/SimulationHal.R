@@ -11,10 +11,17 @@ gendata1=function(n){
   W7=rbinom(n,1,.45)
   W8=rgamma(n, 2, 1)
   W9=runif(n,-4,4)
+<<<<<<< HEAD
   W10= -1*(U1<=.3)+(U1>.3)
   A=rbinom(n,1,{plogis(-.28*W1+5*W2 + W4+.08*W3 -1+W5*W6+.5*W7+W8^2+.2*W9*W10)})
   Y=rnorm(n,2*A+W1*W2+.4*W3-.33*W4*W5+.222*W6-W7*W8+.1*W9+.8*cos(W10),2)
 
+=======
+  W10= -1*(U1<=.3) + (U1>.3)
+  A=rbinom(n,1,{plogis(-.28*W1+5*W2 + W4+.08*W3 -1+W5*W6+.5*W7+W8^2+.2*W9*W10)})
+  Y=rnorm(n,2*A+W1*W2+.4*W3-.33*W4*W5+.222*W6-W7*W8+.1*W9+.8*cos(W10),2)
+  
+>>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
   data.frame(A,W1,W2,W3,W4,W5,W6,W7,W8,W9,W10,Y)
 }
 
@@ -31,12 +38,22 @@ X1 <- simdata1[-12]
 ptm <- proc.time()
 halresults1 <- hal(Y = Y1,
                    X = X1,
+<<<<<<< HEAD
                    verbose = TRUE)
 proc.time() - ptm
 #With 50 obs and 11 cov takes 239.868 seconds
 
 ptm <- proc.time()
 SL_lib <- c("SL.hal", "screen.hal")
+=======
+                   verbose = TRUE,
+                   minVars = 5)
+proc.time() - ptm
+#With 250 obs and 11 cov takes 239.868 seconds
+
+ptm <- proc.time()
+SL_lib <- c(c("SL.hal", "screen.hal"), c("SL.glm"))
+>>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
 sl_halresults1 <- SuperLearner(Y = Y1, X = X1,
                                SL.library = SL_lib,
                                verbose = TRUE)
@@ -57,7 +74,11 @@ gendata4=function(n){
   W9=runif(n,-4,4)
   A=rbinom(n,1,{plogis(-.28*W1+5*W2 + W4+.08*W3 -1+W5*W6+.5*W7+W8^2+.2*W9)})
   Y=rnorm(n,2*A+W1*W2+.4*W3-.33*W4*W5+.222*W6-W7*W8+.1*cos(W9),2)
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
   data.frame(A,W1,W2,W3,W4,W5,W6,W7,W8,W9,Y)
 }
 
@@ -65,6 +86,16 @@ simdata4<-gendata4(250)
 Y4<-simdata4$Y
 X4 <- simdata4[-11]
 
+<<<<<<< HEAD
+=======
+ptm <- proc.time()
+SL_lib <- c("hal", "screen.hal")
+sl_halresults <- SuperLearner(Y = Y1,
+                              X = X1,
+                              SL.library = SL_lib,
+                              verbose = TRUE)
+proc.time() - ptm
+>>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
 
 
 ptm <- proc.time()
@@ -90,7 +121,11 @@ gendata2=function(n){
   W6=rbinom(n,1,.3)
   A=rbinom(n,1,{plogis(-.28*W1+5*W2 + W4+.08*W3 -1+W5*W6)})
   Y=rnorm(n,2*A+W1*W2+.4*W3-.33*W4*W5+.222*W6,2)
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
   data.frame(A,W1,W2,W3,W4,W5,W6,Y)
 }
 
@@ -116,7 +151,11 @@ gendata3=function(n){
   W4=rbinom(n, 1, 0.5)
   A=rbinom(n,1,{plogis(-.28*W1+5*W2 + W4+.08*W3)})
   Y=rnorm(n,2*A+W1*W2+.4*W3-.33*W4,2)
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> e6a5fe2aad7218a92bfb15bc07d5f1ff7d51bcd6
   data.frame(A,W1,W2,W3,W4,Y)
 }
 
