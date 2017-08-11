@@ -30,6 +30,12 @@ compiler:
   - gcc
   #- clang
 
+# Install nlopt package to help nloptr install.
+addons:
+  apt:
+    packages:
+      - libnlopt-dev
+
 env:
   global:
     - CRAN="http://cran.rstudio.com"
