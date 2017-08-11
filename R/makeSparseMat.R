@@ -1,8 +1,8 @@
 #' makeSparseMat
-#' 
+#'
 #' Function to create a sparse design matrix of basis functions
 #' based on a matrix of predictors.
-#' 
+#'
 #' @param X A \code{data.frame} of predictors
 #' @param newX Optional \code{data.frame} on which to return predicted values
 #' @param verbose A \code{boolean} indicating whether to print output on functions progress
@@ -74,7 +74,7 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
 
       # This is the primary cause of execution time and memory usage.
       j.list <- plyr::alply(combos, 2L, function(a) {
-        .getIntersect(uni[a])
+        getIntersect(uni[a])
       })
 
       # list of length d choose k, each entry containing
@@ -101,7 +101,7 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
       # Put it together
       # CK: this is dynamic memory allocation - pre-allocating would be much better if possible.
       # Can we determine what the size will be in advance, or no?
-      # DB: I need to think on this some more. The code above is a hot mess and I should've 
+      # DB: I need to think on this some more. The code above is a hot mess and I should've
       # documented better. Is the dynamic memory allocation hurting?
       i <- c(i, thisi)
       j <- c(j, thisj)
@@ -121,21 +121,21 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
 
 
 #' myIntersect
-#' 
+#'
 #' Helper function for higher order interaction basis functions.
-#' 
+#'
 #' @param ... Arguments passed to intersect
-#' 
-.myIntersect <- function(...) {
+#'
+myIntersect <- function(...) {
   Reduce(intersect, list(...))
 }
 
-#' getIntersect 
-#' 
+#' getIntersect
+#'
 #' Heper function for higher order interaction basis functions.
-#' 
+#'
 #' @param ... Arguments passed to \code{lapply}
-.getIntersect <- function(...) {
+getIntersect <- function(...) {
   tmp <- lapply(..., function(b) {
     split(b[, 2], b[, 1])
   })
@@ -151,7 +151,7 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
 
   # get intersection
   out <- eval(parse(text = paste0(
-    paste0("mapply(.myIntersect,"),
+    paste0("mapply(myIntersect,"),
     paste0("newtmp[[", 1:length(tmp), "]]", collapse = ","),
     ",SIMPLIFY=FALSE)"
   )))
