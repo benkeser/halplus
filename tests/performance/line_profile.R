@@ -14,7 +14,7 @@ data = read.csv(file)
 # TODO: figure out why this is.
 data = data[-nrow(data), ]
 
-library(lineprof)
+library(profvis)
 
 ##########################################
 # Run HAL once on a single dataset (no cross-validation).
@@ -28,7 +28,7 @@ library(lineprof)
 # This system.time() will include extra time due to lineprof()
 # plyr::alply on makeSparseMat.R line 95 seems to be the major memory and time user.
 system.time({
-  prof_result = lineprof::lineprof({
+  prof_result = profvis::profvis({
   result <- hal::hal(Y = data[, 1],
     # Restrict to just the first 7 covariates for testing purposes.
     #X = data[, 2:min(1 + 7, ncol(data))],

@@ -13,9 +13,9 @@ n <- 500
 set.seed(1)
 x = data.frame(matrix(rnorm(n * d), ncol = d))
 
-library(lineprof)
+library(profvis)
 system.time({
-  prof_result = lineprof::lineprof({
+  prof_result = profvis::profvis({
     sparse_mat = hal::makeSparseMat(x)
   })
 })
