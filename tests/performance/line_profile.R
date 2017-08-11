@@ -14,7 +14,6 @@ data = read.csv(file)
 # TODO: figure out why this is.
 data = data[-nrow(data), ]
 
-devtools::install_github("hadley/lineprof")
 library(lineprof)
 
 ##########################################
@@ -23,7 +22,11 @@ library(lineprof)
 
 # Line profiling code from:
 # http://adv-r.had.co.nz/Profiling.html#measure-perf
+# To measure execution time and memory usage.
 
+# Takes 2 minutes to run.
+# This system.time() will include extra time due to lineprof()
+# plyr::alply on makeSparseMat.R line 95 seems to be the major memory and time user.
 system.time({
   prof_result = lineprof::lineprof({
   result <- hal::hal(Y = data[, 1],
@@ -35,7 +38,12 @@ system.time({
 })
 
 # Review timing by section.
+# Sparse matrix: 50%
+# Lasso: 30%
+# Find duplicates: 20%
 result$times
+# Percentages:
+result$times[, "elapsed"] / result$times["everything", "elapsed"]
 
 # Review profiling result.
 prof_result

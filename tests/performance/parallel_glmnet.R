@@ -1,10 +1,8 @@
 library(hal)
-library(testthat)
-
-context("Parallel glmnet")
 
 # Number of covariates to use. This will be slow.
 d <- 12
+#d <- 8
 
 # Sample size
 n <- 500
@@ -29,10 +27,17 @@ if (require(doMC)) {
 # Confirm that we are operating in parallel.
 foreach::getDoParWorkers()
 
-# Fit hal with parallel glmnet.
-hal_fit_par <- hal(Y = y, X = x, family = gaussian(),
-  verbose = T, parallel = T, debug = T
-)
+# Fit hal with parallel glmnet. Takes ~8 minutes on a 4-core laptop.
+hal_fit_par <- hal::hal(Y = y, X = x, family = gaussian(),
+  verbose = T, parallel = T, debug = T)
 
-# Review timing
+# Review timing - takes 487 seconds (23 for glmnet)
 hal_fit_par$times
+
+# Compare to non-parallel version. Takes ~10 minutes.
+hal_fit <- hal(Y = y, X = x, family = gaussian(),
+                   verbose = T, parallel = F, debug = T)
+
+# Review timing - takes 622 seconds (84 for glmnet).
+hal_fit$times
+
