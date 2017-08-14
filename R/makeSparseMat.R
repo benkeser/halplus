@@ -34,6 +34,14 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
   # terms.
   if (verbose) cat("Making", d, "basis functions of dimension 1\n")
 
+  # The outer alply loop is over dimension, the inner alply loop is over
+  # the observed values of data. Given variable x (e.g., the first observed 
+  # predictor variable), we loop over each observed value of that variable
+  # (the inner loop, running over y) and save the indices of observations 
+  # that are smaller than y. These results are saved in variable j. j are the
+  # column indices of non-zero observations in the design matrix of indicator
+  # basis functions. We then make a vector of the same length as j indicating the
+  # row indices of non-zero observations in the design matrix. 
   uni <- plyr::alply(matrix(1:d), 1, function(x) {
     j <- plyr::alply(matrix(newX[, x]), 1, function(y) {
       which(X[, x] <= y)
@@ -47,10 +55,13 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
   # are ties, the length will be different
   nperuni <- lapply(uni, nrow)
 
-  # slap them all together
+  # rbind all of the univariate results together
   uni.ij <- Reduce("rbind", uni)
 
-  # fix up the column indices
+  # currently the column indices (i.e., uni.ij[,2]) run from 1:n,
+  # whereas (if there were no ties) we would like them to run from 
+  # 1:(n*(2^d -1)). This line adds the correct amount to each of the 
+  # indices to correct for this. 
   uni.ij[, 2] <- uni.ij[, 2] +
     rep.int((colStart:colEnd) - 1, times = unlist(nperuni, use.names = FALSE)) *
     nX
@@ -59,7 +70,9 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
   i <- uni.ij[, 1]
   j <- uni.ij[, 2]
 
-  # Loop over higher order terms.
+
+  # Now that we have created a sparse matrix representation of
+  # the univariate terms, we can loop to create higher order terms.
   if (d > 1) {
     for (k in 2:d) {
 
@@ -68,15 +81,29 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
 
       if (verbose) cat("Making", ncol(combos), "basis functions of dimension", k, "\n")
 
-      # Adjust column indicators for column indices.
+      # This is a running count of where columns of the design matrix 
+      # start and end. Each time we loop, we adjust the starting and 
+      # ending point of the column indices. 
       colStart <- colEnd + 1L
       colEnd <- (colStart - 1L) + ncol(combos)
 
-      # This is the primary cause of execution time and memory usage.
+      # !!! This is the primary cause of execution time and memory usage. !!!
+
+      # Here we loop over the various combinations of variables to create
+      # higher order indicator basis functions. In each iteration a is going
+      # to be of length k and uni[a] will be a list of the sparse matrix representation
+      # of the univariate basis functions based on X[,a]. Recall, that this means 
+      # each component of uni[a] will contain a 2 column matrix with row and column
+      # indices for non-zero observations. The sparse matrix representation of the 
+      # columns of the higher order basis function will be the intersection of the column
+      # indices in uni[a]. getIntersect is an ugly function that obtains the intersection
+      # of these indices. 
       j.list <- plyr::alply(combos, 2L, function(a) {
         getIntersect(uni[a])
       })
 
+      # as above we need to now compute the row indices corresponding to the 
+      # observations with non-zero higher order interaction terms. 
       # list of length d choose k, each entry containing
       # n indices of rows corresponding to subjects
       i.list <- plyr::llply(j.list, function(x) {
@@ -101,8 +128,9 @@ makeSparseMat <- function(X, newX = X, verbose = TRUE) {
       # Put it together
       # CK: this is dynamic memory allocation - pre-allocating would be much better if possible.
       # Can we determine what the size will be in advance, or no?
-      # DB: I need to think on this some more. The code above is a hot mess and I should've
-      # documented better. Is the dynamic memory allocation hurting?
+      # DB: I don't think we could pre-determine exact size, but might be able to 
+      # determine an upper bound on the size. However, this doesn't seem to be exactly
+      # straightforward; it might involve some hard combinatorics. 
       i <- c(i, thisi)
       j <- c(j, thisj)
     }
@@ -136,6 +164,7 @@ myIntersect <- function(...) {
 #'
 #' @param ... Arguments passed to \code{lapply}
 getIntersect <- function(...) {
+  # make a list of column indices split by row index
   tmp <- lapply(..., function(b) {
     split(b[, 2], b[, 1])
   })
