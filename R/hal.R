@@ -2,14 +2,14 @@
 #'
 #' The highly adaptive lasso fitting function. This function takes a matrix of predictor values
 #' (which can be binary or continuous) and converts it into a set of indicator basis functions
-#' that perfectly fit the data. The function then uses cross-validated lasso (via the \code{glmnet} 
-#' package) to select basis functions. The resulting fit is called the highly adaptive lasso. 
-#' The process of creating the indicator basis functions can be extremely time and memory intensive 
-#' as it involves creating n(2^d - 1) basis functions, where n is the number of observations 
+#' that perfectly fit the data. The function then uses cross-validated lasso (via the \code{glmnet}
+#' package) to select basis functions. The resulting fit is called the highly adaptive lasso.
+#' The process of creating the indicator basis functions can be extremely time and memory intensive
+#' as it involves creating n(2^d - 1) basis functions, where n is the number of observations
 #' and d the number of covariates. The function also must subsequently search over basis functions
-#' for those that are duplicated and store the results. Future implementations will attempt to 
+#' for those that are duplicated and store the results. Future implementations will attempt to
 #' streamline this process to the largest extent possible; however, for the time being implementing
-#' with values of n and d such that n(2^d - 1) > 1e7 is not recommended. 
+#' with values of n and d such that n(2^d - 1) > 1e7 is not recommended.
 #'
 #' @param Y A \code{numeric} of outcomes
 #' @param X A \code{data.frame} of predictors
@@ -20,10 +20,10 @@
 #' @param nlambda Number of lambda values to search across in \code{cv.glmnet}
 #' @param useMin Option passed to \code{cv.glmnet}, use minimum risk lambda or 1se lambda (more
 #'   penalization)
-#' @param debug For benchmarking. Setting to \code{TRUE} will run garbage collection to 
+#' @param debug For benchmarking. Setting to \code{TRUE} will run garbage collection to
 #' improve the accuracy of memory monitoring
 #' @param parallel A boolean indicating whether to use a parallel backend, if possible
-#' @param ... Not currently used 
+#' @param ... Not currently used
 #' @importFrom glmnet cv.glmnet
 #' @importFrom bit bit
 #' @importFrom stats gaussian predict
@@ -67,7 +67,7 @@ hal <- function(Y,
   pred <- NULL
   times <- NULL
 
-  #------------------------------------------------------------  
+  #------------------------------------------------------------
   # Make initial design matrix (including duplicated columns)
   #------------------------------------------------------------
   if (verbose) cat("Making sparse matrix \n")
@@ -82,9 +82,9 @@ hal <- function(Y,
   # Run garbage collection if we are in debug mode.
   if (debug) gc()
 
-  #------------------------------------------------------------  
+  #------------------------------------------------------------
   # Removing duplicated columns
-  # TODO: Should this code be wrapped up in a function or would 
+  # TODO: Should this code be wrapped up in a function or would
   # passing all those objects to another function waste memory?
   #------------------------------------------------------------
   if (verbose) cat("Finding duplicate columns \n")
@@ -97,9 +97,9 @@ hal <- function(Y,
     data.table(ID = 1:nIndCols,
                bit_to_int_to_str = rep.int("0", nIndCols))
   # Each column in X.init will be represented by a unique vector of integers.
-  # Each indicator column in X.init will be converted to a row of integers or 
-  # a string of cat'ed integers in data.table. The number of integers needed to 
-  # represent a single column is determined automatically by package "bit" and 
+  # Each indicator column in X.init will be converted to a row of integers or
+  # a string of cat'ed integers in data.table. The number of integers needed to
+  # represent a single column is determined automatically by package "bit" and
   # it depends on nrow(X.init)
   nbits <- nrow(X.init) # number of bits (0/1) used by each column in X.init
   bitvals <- bit::bit(length = nbits) # initial allocation (all 0/FALSE)
@@ -124,8 +124,8 @@ hal <- function(Y,
     # stringval <- str_c(intval, collapse = "")
     if (any(is.na(intval)))
       ID_withNA <- c(ID_withNA, i)
-    data.table::set(datDT, i, 2L, 
-                    value = stringr::str_c(stringr::str_replace_na(intval), 
+    data.table::set(datDT, i, 2L,
+                    value = stringr::str_c(stringr::str_replace_na(intval),
                                            collapse = ""))
   }
   # create a hash-key on the string representation of the column,
@@ -133,7 +133,7 @@ hal <- function(Y,
   data.table::setkey(datDT, bit_to_int_to_str)
   # add logical column indicating duplicates,
   # following the first non-duplicate element
-  datDT[, duplicates := duplicated(datDT)]
+  datDT[, duplicates := duplicated(datDT, by="bit_to_int_to_str")]
   # just get the column IDs and duplicate indicators:
   datDT[, .(ID, duplicates)]
 
@@ -141,10 +141,10 @@ hal <- function(Y,
 
   #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   # OS: NEW FASTER APPROACH TO FIND DUPLICATE IDs
-  # get the number of duplicates in each group if its 1 the column is 
+  # get the number of duplicates in each group if its 1 the column is
   # unique and we are note interested:
   datDT[, Ngrp := .N, by = bit_to_int_to_str]
-  # collapse each duplicate group into a list of IDs, do that only 
+  # collapse each duplicate group into a list of IDs, do that only
   # among strings that have duplicates
   collapsedDT <- datDT[Ngrp > 1, list(list(ID)), by = bit_to_int_to_str]
   colDups <- collapsedDT[["V1"]]
@@ -166,7 +166,7 @@ hal <- function(Y,
   # Run garbage collection if we are in debug mode.
   if (debug) gc()
 
-  #------------------------------------------------------------  
+  #------------------------------------------------------------
   # Fit lasso
   #------------------------------------------------------------
 
@@ -210,7 +210,7 @@ hal <- function(Y,
   }
   time_lasso_end <- proc.time()
   time_lasso <- time_dup_end - time_lasso_end
-  #------------------------------------------------------------  
+  #------------------------------------------------------------
   # Initial output object (pred and times added below)
   #------------------------------------------------------------
   fit <- list(object = fitCV,
