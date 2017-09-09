@@ -44,6 +44,7 @@ hal <- function(Y,
                 useMin = TRUE,
                 debug = TRUE,
                 parallel = FALSE,
+                family,
                 ... # allow extra arguments with no death
                 ) {
 
@@ -187,7 +188,7 @@ hal <- function(Y,
         lambda.min.ratio = 0.001,
         type.measure = "deviance",
         nfolds = nfolds,
-        family = "gaussian",
+        family = family,
         alpha = 1,
         nlambda = nlambda,
         parallel = parallel
@@ -202,7 +203,7 @@ hal <- function(Y,
       lambda.min.ratio = 0.001,
       type.measure = "deviance",
       nfolds = nfolds,
-      family = "gaussian",
+      family = family,
       alpha = 1,
       nlambda = nlambda,
       parallel = parallel
@@ -245,7 +246,8 @@ hal <- function(Y,
     pred <- predict(fit,
                     newdata = newX,
                     bigDesign = FALSE,
-                    chunks = 10000)
+                    chunks = 10000
+                    )
   }
 
   # wrap up the timing

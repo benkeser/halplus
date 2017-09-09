@@ -51,7 +51,7 @@ SL.hal <- function(Y,
 #' @export 
 predict.SL.hal <- function(object, newdata, bigDesign = FALSE, chunks = 5000, ...){
       pred <- stats::predict(object$object, newdata = newdata, bigDesign = bigDesign, 
-                      chunks = chunks,...)
+                      chunks = chunks, ...)
       return(pred)
 }
 
