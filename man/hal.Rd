@@ -31,6 +31,8 @@ improve the accuracy of memory monitoring}
 
 \item{parallel}{A boolean indicating whether to use a parallel backend, if possible}
 
+\item{family}{binomial() or gaussian()}
+
 \item{...}{Not currently used}
 }
 \description{
