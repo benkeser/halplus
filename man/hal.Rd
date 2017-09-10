@@ -6,7 +6,7 @@
 \usage{
 hal(Y, X, newX = NULL, verbose = FALSE, obsWeights = rep(1, length(Y)),
   nfolds = ifelse(length(Y) <= 100, 20, 10), nlambda = 100, useMin = TRUE,
-  debug = TRUE, parallel = FALSE, ...)
+  debug = TRUE, parallel = FALSE, family, ...)
 }
 \arguments{
 \item{Y}{A \code{numeric} of outcomes}
@@ -26,7 +26,7 @@ hal(Y, X, newX = NULL, verbose = FALSE, obsWeights = rep(1, length(Y)),
 \item{useMin}{Option passed to \code{cv.glmnet}, use minimum risk lambda or 1se lambda (more
 penalization)}
 
-\item{debug}{For benchmarking. Setting to \code{TRUE} will run garbage collection to 
+\item{debug}{For benchmarking. Setting to \code{TRUE} will run garbage collection to
 improve the accuracy of memory monitoring}
 
 \item{parallel}{A boolean indicating whether to use a parallel backend, if possible}
@@ -36,12 +36,12 @@ improve the accuracy of memory monitoring}
 \description{
 The highly adaptive lasso fitting function. This function takes a matrix of predictor values
 (which can be binary or continuous) and converts it into a set of indicator basis functions
-that perfectly fit the data. The function then uses cross-validated lasso (via the \code{glmnet} 
-package) to select basis functions. The resulting fit is called the highly adaptive lasso. 
-The process of creating the indicator basis functions can be extremely time and memory intensive 
-as it involves creating n(2^d - 1) basis functions, where n is the number of observations 
+that perfectly fit the data. The function then uses cross-validated lasso (via the \code{glmnet}
+package) to select basis functions. The resulting fit is called the highly adaptive lasso.
+The process of creating the indicator basis functions can be extremely time and memory intensive
+as it involves creating n(2^d - 1) basis functions, where n is the number of observations
 and d the number of covariates. The function also must subsequently search over basis functions
-for those that are duplicated and store the results. Future implementations will attempt to 
+for those that are duplicated and store the results. Future implementations will attempt to
 streamline this process to the largest extent possible; however, for the time being implementing
 with values of n and d such that n(2^d - 1) > 1e7 is not recommended.
 }
