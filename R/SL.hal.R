@@ -27,7 +27,7 @@ SL.hal <- function(Y,
                    ...) {
       halOut <- hal(Y = Y, X = X, newX = newX, verbose = verbose,
       obsWeights = obsWeights, nfolds = nfolds,
-      nlambda = nlambda, useMin = useMin, family = family$family, ...)
+      nlambda = nlambda, useMin = useMin, family = family, ...)
 
       out <- list(object = halOut, pred = halOut$pred)
       class(out) <- "SL.hal"
