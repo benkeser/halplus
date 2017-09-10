@@ -23,6 +23,7 @@
 #' @param debug For benchmarking. Setting to \code{TRUE} will run garbage collection to
 #' improve the accuracy of memory monitoring
 #' @param parallel A boolean indicating whether to use a parallel backend, if possible
+#' @param family binomial() or gaussian()
 #' @param ... Not currently used
 #' @importFrom glmnet cv.glmnet
 #' @importFrom bit bit
