@@ -45,7 +45,7 @@ hal <- function(Y,
                 useMin = TRUE,
                 debug = TRUE,
                 parallel = FALSE,
-                family,
+                family = gaussian(),
                 ... # allow extra arguments with no death
                 ) {
 
