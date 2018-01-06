@@ -11,7 +11,7 @@
 #' 
 #' @importFrom Matrix sparseMatrix
 
-doPred <- function(object, newdata, verbose = FALSE, s, offset = NULL) {
+doPred <- function(object, newdata, verbose = FALSE, s, offset) {
   if (is.vector(newdata))
     newdata <- matrix(newdata)
 
