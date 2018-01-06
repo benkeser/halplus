@@ -23,6 +23,7 @@ predict.hal <-
            verbose = TRUE,
            chunks = 5000,
            s = ifelse(object$useMin, object$object$lambda.min, object$object$lambda.1se),
+           offset = NULL,
            ...)
   {
     # all predictions at once
