@@ -35,7 +35,7 @@
 #'
 #' @export
 
-hal <- function(Y,
+halplus <- function(Y,
                 X,
                 newX = NULL,
                 verbose = FALSE,
