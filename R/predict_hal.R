@@ -30,7 +30,8 @@ predict.hal <-
     if (bigDesign) {
       pred <- doPred(object = object,
                      newdata = newdata,
-                     verbose = verbose)
+                     verbose = verbose,
+                     offset = offset)
     } else {
       nNew <- length(newdata[, 1])
       nChunks <- floor(nNew / chunks) + ifelse(nNew %% chunks == 0, 0, 1)
@@ -43,7 +44,8 @@ predict.hal <-
             object = object,
             s = s,
             newdata = newdata[minC:maxC, ],
-            verbose = verbose
+            verbose = verbose,
+            offset = offset
           )
       }
     }
