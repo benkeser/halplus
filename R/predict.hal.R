@@ -8,6 +8,7 @@ predict.hal <-
            verbose = TRUE,
            chunks = 1000,
            s = ifelse(object$useMin, object$object$lambda.min, object$object$lambda.1se),
+           offset = NULL,
            ...)
   {
     if (!object$sparseMat) {
@@ -49,7 +50,8 @@ predict.hal <-
           object$object$glmnet.fit,
           newx = designNewX,
           s = s,
-          type = "response"
+          type = "response",
+          offset = offset
         )
 
       } else {
@@ -92,7 +94,8 @@ predict.hal <-
               object$object$glmnet.fit,
               newx = matrix(designNewX, nrow = 1),
               s = s,
-              type = "response"
+              type = "response",
+              offset = offset
             )
           thispred
         })
@@ -115,7 +118,8 @@ predict.hal <-
               object = object,
               s = s,
               newdata = newdata[minC:maxC, ],
-              verbose = verbose
+              verbose = verbose,
+              offset = offset
             )
         }
       }
