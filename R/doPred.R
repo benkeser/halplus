@@ -100,6 +100,6 @@ doPred <- function(object, newdata, verbose = FALSE, s, offset) {
   # call predict.glmnet to get predictions on new sparseMat with duplicate 
   # columns removed. 
   pred <- stats::predict(object$object$glmnet.fit, newx = tmp,
-                  s = s, type = 'response', offset = offset)
+                  s = s, type = 'response', newoffset = offset)
   return(pred)
 }

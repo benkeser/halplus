@@ -51,7 +51,7 @@ predict.hal <-
           newx = designNewX,
           s = s,
           type = "response",
-          offset = offset
+          newoffset = offset
         )
 
       } else {
@@ -95,7 +95,7 @@ predict.hal <-
               newx = matrix(designNewX, nrow = 1),
               s = s,
               type = "response",
-              offset = offset
+              newoffset = offset
             )
           thispred
         })
@@ -105,7 +105,8 @@ predict.hal <-
       if (bigDesign) {
         pred <- doPred(object = object,
                        newdata = newdata,
-                       verbose = verbose)
+                       verbose = verbose,
+                       offset = offset)
       } else {
         nNew <- length(newdata[, 1])
         nChunks <- floor(nNew / chunks) + ifelse(nNew %% chunks == 0, 0, 1)
