@@ -193,8 +193,7 @@ halplus <- function(Y,
         family = family$family,
         alpha = 1,
         nlambda = nlambda,
-        parallel = parallel,
-        offset = offset
+        parallel = parallel
       )    
   } else {
     fitCV <-
@@ -209,7 +208,8 @@ halplus <- function(Y,
         family = family$family,
         alpha = 1,
         nlambda = nlambda,
-        parallel = parallel
+        parallel = parallel,
+        offset = offset
       )    
   }
     } else {
@@ -226,8 +226,7 @@ halplus <- function(Y,
             family = family$family,
             alpha = 1,
             nlambda = nlambda,
-            parallel = parallel,
-            offset = offset
+            parallel = parallel
           )    
       } else {
         fitCV <-
@@ -242,7 +241,8 @@ halplus <- function(Y,
             family = family$family,
             alpha = 1,
             nlambda = nlambda,
-            parallel = parallel
+            parallel = parallel,
+            offset = offset
           )    
       }
   }
