@@ -180,7 +180,7 @@ halplus <- function(Y,
       unlist(lapply(colDups, function(x) {
         x[[1]]
       }), use.names = FALSE)
-
+  if (is.null(offset)) {
     fitCV <-
       glmnet::cv.glmnet(
         x = X.init[, c(keepDupInds, notDupInds)],
@@ -195,23 +195,56 @@ halplus <- function(Y,
         nlambda = nlambda,
         parallel = parallel,
         offset = offset
-      )
+      )    
   } else {
-    # No duplication.
-    fitCV <- glmnet::cv.glmnet(
-      x = X.init,
-      y = Y,
-      weights = obsWeights,
-      lambda = NULL,
-      lambda.min.ratio = 0.001,
-      type.measure = "deviance",
-      nfolds = nfolds,
-      family = family$family,
-      alpha = 1,
-      nlambda = nlambda,
-      parallel = parallel,
-      offset = offset
-    )
+    fitCV <-
+      glmnet::cv.glmnet(
+        x = X.init[, c(keepDupInds, notDupInds)],
+        y = Y,
+        weights = obsWeights,
+        lambda = NULL,
+        lambda.min.ratio = 0.001,
+        type.measure = "deviance",
+        nfolds = nfolds,
+        family = family$family,
+        alpha = 1,
+        nlambda = nlambda,
+        parallel = parallel
+      )    
+  }
+    } else {
+      if (is.null(offset)) {
+        fitCV <-
+          glmnet::cv.glmnet(
+            x = X.init[, c(keepDupInds, notDupInds)],
+            y = Y,
+            weights = obsWeights,
+            lambda = NULL,
+            lambda.min.ratio = 0.001,
+            type.measure = "deviance",
+            nfolds = nfolds,
+            family = family$family,
+            alpha = 1,
+            nlambda = nlambda,
+            parallel = parallel,
+            offset = offset
+          )    
+      } else {
+        fitCV <-
+          glmnet::cv.glmnet(
+            x = X.init[, c(keepDupInds, notDupInds)],
+            y = Y,
+            weights = obsWeights,
+            lambda = NULL,
+            lambda.min.ratio = 0.001,
+            type.measure = "deviance",
+            nfolds = nfolds,
+            family = family$family,
+            alpha = 1,
+            nlambda = nlambda,
+            parallel = parallel
+          )    
+      }
   }
   time_lasso_end <- proc.time()
   time_lasso <- time_dup_end - time_lasso_end
