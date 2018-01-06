@@ -11,7 +11,7 @@
 #' 
 #' @importFrom Matrix sparseMatrix
 
-doPred <- function(object, newdata, verbose = FALSE, s) {
+doPred <- function(object, newdata, verbose = FALSE, s, offset) {
   if (is.vector(newdata))
     newdata <- matrix(newdata)
 
@@ -99,7 +99,12 @@ doPred <- function(object, newdata, verbose = FALSE, s) {
 
   # call predict.glmnet to get predictions on new sparseMat with duplicate 
   # columns removed. 
-  pred <- stats::predict(object$object$glmnet.fit, newx = tmp,
-                  s = s)
+  if (is.null(offset)) {
+    pred <- stats::predict(object$object$glmnet.fit, newx = tmp,
+                           s = s, type = 'response')
+  } else {
+    pred <- stats::predict(object$object$glmnet.fit, newx = tmp,
+                           s = s, type = 'response', newoffset = offset)
+    }
   return(pred)
 }

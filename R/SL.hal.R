@@ -27,7 +27,7 @@ SL.hal <- function(Y,
                    ...) {
       halOut <- hal(Y = Y, X = X, newX = newX, verbose = verbose,
       obsWeights = obsWeights, nfolds = nfolds,
-      nlambda = nlambda, useMin = useMin, ...)
+      nlambda = nlambda, useMin = useMin, family = family, ...)
 
       out <- list(object = halOut, pred = halOut$pred)
       class(out) <- "SL.hal"
@@ -51,7 +51,7 @@ SL.hal <- function(Y,
 #' @export 
 predict.SL.hal <- function(object, newdata, bigDesign = FALSE, chunks = 5000, ...){
       pred <- stats::predict(object$object, newdata = newdata, bigDesign = bigDesign, 
-                      chunks = chunks,...)
+                      chunks = chunks, ...)
       return(pred)
 }
 

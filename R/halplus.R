@@ -35,7 +35,7 @@
 #'
 #' @export
 
-hal <- function(Y,
+halplus <- function(Y,
                 X,
                 newX = NULL,
                 verbose = FALSE,
@@ -46,6 +46,7 @@ hal <- function(Y,
                 debug = TRUE,
                 parallel = FALSE,
                 family = gaussian(),
+                offset = NULL,
                 ... # allow extra arguments with no death
                 ) {
 
@@ -179,7 +180,7 @@ hal <- function(Y,
       unlist(lapply(colDups, function(x) {
         x[[1]]
       }), use.names = FALSE)
-
+  if (is.null(offset)) {
     fitCV <-
       glmnet::cv.glmnet(
         x = X.init[, c(keepDupInds, notDupInds)],
@@ -193,22 +194,57 @@ hal <- function(Y,
         alpha = 1,
         nlambda = nlambda,
         parallel = parallel
-      )
+      )    
   } else {
-    # No duplication.
-    fitCV <- glmnet::cv.glmnet(
-      x = X.init,
-      y = Y,
-      weights = obsWeights,
-      lambda = NULL,
-      lambda.min.ratio = 0.001,
-      type.measure = "deviance",
-      nfolds = nfolds,
-      family = family$family,
-      alpha = 1,
-      nlambda = nlambda,
-      parallel = parallel
-    )
+    fitCV <-
+      glmnet::cv.glmnet(
+        x = X.init[, c(keepDupInds, notDupInds)],
+        y = Y,
+        weights = obsWeights,
+        lambda = NULL,
+        lambda.min.ratio = 0.001,
+        type.measure = "deviance",
+        nfolds = nfolds,
+        family = family$family,
+        alpha = 1,
+        nlambda = nlambda,
+        parallel = parallel,
+        offset = offset
+      )    
+  }
+    } else {
+      if (is.null(offset)) {
+        fitCV <-
+          glmnet::cv.glmnet(
+            x = X.init[, c(keepDupInds, notDupInds)],
+            y = Y,
+            weights = obsWeights,
+            lambda = NULL,
+            lambda.min.ratio = 0.001,
+            type.measure = "deviance",
+            nfolds = nfolds,
+            family = family$family,
+            alpha = 1,
+            nlambda = nlambda,
+            parallel = parallel
+          )    
+      } else {
+        fitCV <-
+          glmnet::cv.glmnet(
+            x = X.init[, c(keepDupInds, notDupInds)],
+            y = Y,
+            weights = obsWeights,
+            lambda = NULL,
+            lambda.min.ratio = 0.001,
+            type.measure = "deviance",
+            nfolds = nfolds,
+            family = family$family,
+            alpha = 1,
+            nlambda = nlambda,
+            parallel = parallel,
+            offset = offset
+          )    
+      }
   }
   time_lasso_end <- proc.time()
   time_lasso <- time_dup_end - time_lasso_end
@@ -224,49 +260,5 @@ hal <- function(Y,
               times = NULL
               )
   class(fit) <- "hal"
-
-  if (identical(X, newX)) {
-    if (length(dupInds) > 0) {
-      pred <-
-        predict(
-          fitCV,
-          newx = X.init[, c(keepDupInds, notDupInds)],
-          s = ifelse(useMin, fitCV$lambda.min, fitCV$lambda.1se),
-          type = "response"
-        )
-    } else{
-      pred <-
-        predict(
-          fitCV,
-          newx = X.init,
-          s = ifelse(useMin, fitCV$lambda.min, fitCV$lambda.1se),
-          type = "response"
-        )
-    }
-  } else if (!is.null(newX)) {
-    pred <- predict(fit,
-                    newdata = newX,
-                    bigDesign = FALSE,
-                    chunks = 10000
-                    )
-  }
-
-  # wrap up the timing
-  time_pred_end <- proc.time()
-  time_pred <- time_pred_end - time_lasso_end
-  time_everything <- time_pred_end - time_sparse_start
-  times <- list(sparse_matrix = time_sparse_matrix,
-            find_duplicates = time_find_duplicates,
-            lasso = time_lasso,
-            pred = time_pred,
-            everything = time_everything)
-  times <- t(simplify2array(times))
-
-  # Run garbage collection if we are in debug mode.
-  if (debug) gc()
-
-  fit$pred <- pred
-  fit$times <- times
-  if (verbose) cat("Done with hal\n")
   return(fit)
 }
